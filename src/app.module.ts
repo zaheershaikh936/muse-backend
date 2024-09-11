@@ -1,18 +1,24 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { LoggerMiddleware } from './utils/common/interceptor/http.logger/http.logger';
+import { GlobalExceptionFilter } from './utils/common/interceptor';
+import { ConfigModule } from '@nestjs/config';
+import { AppController, AppService, AuthModule } from './app';
 import { MongooseModule } from '@nestjs/mongoose';
-import {default as config} from './config';
-
-const userString = config.db.user && config.db.pass ? (config.db.user + ':' + config.db.pass + '@') : '';
-const authSource = config.db.authSource ? ('?authSource='+config.db.authSource + '&w=1') : '' ;
-
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://' + userString + config.db.host + ':' + (config.db.port || '27017') +'/' + config.db.database + authSource), UsersModule, AuthModule],
+  imports: [
+    SentryModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(process.env.DB),
+    AuthModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: GlobalExceptionFilter, useClass: SentryGlobalFilter }],
 })
-export class AppModule {}
-
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

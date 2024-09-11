@@ -1,0 +1,501 @@
+import { Text, View } from 'react-native';
+import React from 'react';
+import { styles } from '../../assets/css/styles';
+import { ZButton, ZImage, ZText } from '../../elements';
+import { getMonthAndDate } from '../../utils/Helper/date';
+import { COLORS } from '../../common/colors';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation as useNativeNavigation } from '@react-navigation/native';
+import { window } from '../../utils/windows';
+import { useAtom } from 'jotai';
+import { accessToken, loadingScreen } from '../../utils/state';
+import { fetchAllColorWithCode, fetchProductById } from '../../api/requestApi';
+import {
+  BodyConditionProp,
+  addressPost,
+  bodyTypeProp,
+  brandPost,
+  colorExteriorProp,
+  colorInteriorProp,
+  cylinderProp,
+  descriptionPost,
+  doorProp,
+  engineCapacityProp,
+  fuelProp,
+  horsePowerProp,
+  imagesPost,
+  kilometerPost,
+  locationCord,
+  locationPost,
+  modelPost,
+  postId,
+  pricePost,
+  regionalSpecProp,
+  steeringSide,
+  titlePost,
+  transmissionProp,
+  trimPost,
+  vinNum,
+  warrantyPost,
+  yearPost,
+} from '../../utils/state/post';
+import { stack } from '../../routes/pages.name';
+import Loading from '../loading';
+import { isIos } from '../../utils/platform';
+
+interface AdsCardProps {
+  image: string;
+  title: string;
+  status: string;
+  price: string;
+  expiredAt: string;
+  updatedAt: string;
+  type: boolean;
+  id: string;
+  stage: string;
+}
+
+type Stage =
+  | 'post'
+  | 'adsPost'
+  | 'adsPostAddition'
+  | 'ExtraFeatures'
+  | 'adsPostSubscription';
+
+type RootStackParamList = {
+  bottomTab: {
+    screen: Stage; // Adjust type to Stage
+    params: { id: string };
+  };
+  stage: {
+    params: { id: string };
+  };
+};
+
+type NavigationProps = {
+  navigate: any;
+  navigation: StackNavigationProp<RootStackParamList>;
+  stage: Stage;
+  id: string;
+};
+
+const AdsCard: React.FC<AdsCardProps> = ({
+  image,
+  title,
+  status,
+  price,
+  expiredAt,
+  updatedAt,
+  id,
+  stage,
+}) => {
+  const [token] = useAtom(accessToken);
+  const [loading, setLoading] = useAtom(loadingScreen);
+  const useNavigation = () => useNativeNavigation<NavigationProps>();
+  const navigation = useNavigation();
+  const [, setSelectedLocation] = useAtom(locationPost);
+  const [, setVinNumber] = useAtom(vinNum);
+  const [, setBrand] = useAtom(brandPost);
+  const [, setModel] = useAtom(modelPost);
+  const [, setTrim] = useAtom(trimPost);
+  const [, setRegionalSpecs] = useAtom(regionalSpecProp);
+  const [, setYear] = useAtom(yearPost);
+  const [, setKilometer] = useAtom(kilometerPost);
+  const [, setWarranty] = useAtom(warrantyPost);
+  const [, setPrice] = useAtom(pricePost);
+  const [, setTitle] = useAtom(titlePost);
+  const [, setPickedImages] = useAtom(imagesPost);
+  const [, setDescription] = useAtom(descriptionPost);
+  const [, setFuelType] = useAtom(fuelProp);
+  const [, setBodyTypCondition] = useAtom(BodyConditionProp);
+  const [, setExterior] = useAtom(colorExteriorProp);
+  const [, setInterior] = useAtom(colorInteriorProp);
+  const [, setCylinder] = useAtom(cylinderProp);
+  const [, setTransmission] = useAtom(transmissionProp);
+  const [, setBodyType] = useAtom(bodyTypeProp);
+  const [, setHorsePower] = useAtom(horsePowerProp);
+  const [, setDoor] = useAtom(doorProp);
+  const [, setSteeringSide] = useAtom(steeringSide);
+  const [, setEngineCapacity] = useAtom(engineCapacityProp);
+  const [, setAddress] = useAtom(addressPost);
+  const [, setLocation] = useAtom(locationCord);
+  const [, setPostId] = useAtom(postId);
+  const date = getMonthAndDate(expiredAt || updatedAt);
+  let dateText;
+  if (expiredAt) {
+    dateText = 'Valid until';
+  } else if (updatedAt) {
+    dateText = 'Last Updated';
+  }
+
+  const ButtonComponent = ({ adsId }: ButtonT) => {
+    if (status === 'Live') {
+      return (
+        <View style={[styles.flex, styles.justifyBetween, styles.mt20]}>
+          <ZButton
+            onPress={() => editPost(adsId)}
+            title="Edit Post"
+            style={[
+              styles.buttonSecondary,
+              {
+                width: '40%',
+                borderColor: '#F04438',
+                borderWidth: 1,
+                height: 40,
+              },
+            ]}
+            type={'secondary'}
+            textStyle={{
+              color: '#F04438',
+              fontSize: 16,
+              fontWeight: '500',
+            }}
+          />
+          {/* ; */}
+
+          <ZButton
+            onPress={() =>
+              navigation.navigate(stack.ADS_ADDITION_SUBSCRIPTION, {
+                params: { adsId, status },
+              })
+            }
+            title="Extend Ads"
+            style={[
+              styles.buttonPrimary,
+              {
+                paddingVertical: 8,
+                height: 40,
+              },
+            ]}
+            type={'primary'}
+            textStyle={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: '500',
+            }}
+          />
+        </View>
+      );
+    } else if (status === 'Draft') {
+      return (
+        <View
+          style={[
+            styles.flex,
+            styles.wFull,
+            styles.justifyCenter,
+            styles.mt20,
+          ]}>
+          <ZButton
+            onPress={() => {
+              if (stage === 'post') {
+                navigation.navigate('bottomTab', {
+                  screen: stage,
+                  params: { adsId },
+                });
+              } else {
+                navigation.navigate(stage, { params: { adsId } });
+              }
+            }}
+            title=" Continue with Posting this Ads "
+            style={[
+              styles.buttonPrimary,
+              {
+                width: window.width * 0.85,
+                height: 40,
+              },
+            ]}
+            type={'primary'}
+            textStyle={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: '500',
+              textAlign: 'center',
+            }}
+          />
+        </View>
+      );
+    } else if (status === 'Payment Pending') {
+      return (
+        <View
+          style={[
+            styles.flex,
+            styles.wFull,
+            styles.justifyCenter,
+            styles.mt20,
+          ]}>
+          <ZButton
+            onPress={() => navigation.navigate(stage, { params: { adsId } })}
+            title=" Complete Payment "
+            style={[
+              styles.buttonPrimary,
+              {
+                width: window.width * 0.85,
+                height: 40,
+              },
+            ]}
+            type={'primary'}
+            textStyle={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: '500',
+              textAlign: 'center',
+            }}
+          />
+        </View>
+      );
+    }
+  };
+
+  const editPost = async (editId: string) => {
+    setLoading(true);
+    const { data, status: statusProduct } = await fetchProductById(editId, token);
+    const response = await fetchAllColorWithCode(token);
+    for (const color of response.data.colors) {
+      if (color.name === data.productData.exteriorColor) {
+        setExterior(color);
+      }
+      if (color.name === data.productData.interiorColor) {
+        setInterior(color);
+      }
+    }
+    if (statusProduct === 200) {
+      setSelectedLocation(data.city);
+      setBrand({ _id: data.brand.brandId, name: data.brand.brandName });
+      setModel({ _id: data.model.modelId, name: data.model.modelName });
+      setVinNumber(data.productData.vinNumber);
+      setTrim(data.productData.trim);
+      setRegionalSpecs({ name: data.productData.regionalSpecs });
+      setYear(data.year);
+      setKilometer(data.productData.kilometer);
+      setWarranty({
+        value: data.productData.warranty,
+        name: !data.productData.warranty ? 'Yes' : 'No',
+      });
+      setPrice(data.price.replace('AED ', ''));
+      setTitle(data.title);
+      setPickedImages(data.images as never[]);
+      setDescription(data.description);
+      setFuelType({ name: data.productData.fuelType });
+      setBodyTypCondition({ name: data.productData.bodyCondition });
+      setCylinder({ name: data.productData.cylinder });
+      setTransmission({ name: data.productData.transmission });
+      setBodyType({ name: data.productData.bodyType });
+      setHorsePower(data.productData.horsePower);
+      setDoor({ name: data.productData.doors });
+      setSteeringSide(data.productData.steeringSide);
+      setEngineCapacity(data.productData.engineCapacity);
+      setAddress(data.address);
+      setLocation({
+        latitude: parseFloat(data.location.lat),
+        longitude: parseFloat(data.location.long),
+      });
+      setLoading(false);
+      setPostId(data._id);
+      navigation.navigate(stack.BOTTOMTAB, {
+        screen: stack.ADS_LOCATION,
+      });
+    }
+  };
+
+  if (loading) {
+    return <Loading />;
+  }
+  return (
+    <View style={styles.mt20}>
+      <View style={[styles.premiumCardBg, styles.roundedMd]}>
+        <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+          <View style={[styles.flex, styles.gap5]}>
+            <ZImage
+              source={{
+                uri: image,
+              }}
+              imgStyle={{
+                width: '40%',
+                height: 100,
+                objectFit: 'cover',
+                borderRadius: 10,
+              }}
+            />
+            <View style={[styles.wFull]}>
+              <ZText
+                numberOfLines={2}
+                title={title === 'undefined undefined' ? 'No Title' : title}
+                style={[styles.text17, styles.fontSemiBold, { width: '60%' }]}
+              />
+              <Text
+                style={[
+                  styles.text15,
+                  styles.textCenter,
+                  styles.fontSemiBold,
+                  {
+                    marginVertical: 5,
+                    padding: 2,
+                    color: 'white',
+                    width: isIos ? '45%' : '40%',
+                    borderRadius: 50,
+                    height: isIos ? 22 : 25,
+                    backgroundColor:
+                      status === 'Live'
+                        ? '#2ecc71'
+                        : status === 'Draft'
+                          ? '#0BA5EC'
+                          : COLORS.PRIMARY,
+                  },
+                ]}>{` ${status} `}</Text>
+              <ZText
+                title={`AED ${price}`}
+                style={[
+                  styles.textMd,
+                  styles.mt5,
+                  styles.textBold,
+                  styles.textPrimary,
+                ]}
+              />
+              <ZText
+                title={` ${dateText} ${date}`}
+                style={[
+                  styles.textSm,
+                  styles.mt5,
+                  styles.textBold,
+                  {
+                    color: '#98A2B3',
+                  },
+                ]}
+              />
+            </View>
+          </View>
+          <ButtonComponent
+            adsId={id}
+            status={status}
+            stage={stage}
+            navigation={navigation}
+            editPost={editPost}
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
+
+interface ButtonT {
+  adsId: string;
+  status: string;
+  stage: string;
+  navigation: any;
+  editPost: (id: string) => Promise<void>;
+}
+
+const ButtonComponent: React.FC<ButtonT> = ({
+  adsId,
+  status,
+  stage,
+  navigation,
+  editPost,
+}) => {
+  if (status === 'Live') {
+    return (
+      <View style={[styles.flex, styles.justifyBetween, styles.mt20]}>
+        <ZButton
+          onPress={() => editPost(adsId)}
+          title="Edit Post"
+          style={[
+            styles.buttonSecondary,
+            {
+              width: '40%',
+              borderColor: '#F04438',
+              borderWidth: 1,
+              height: 40,
+            },
+          ]}
+          type={'secondary'}
+          textStyle={{
+            color: '#F04438',
+            fontSize: 16,
+            fontWeight: '500',
+          }}
+        />
+        <ZButton
+          onPress={() =>
+            navigation.navigate(stack.ADS_ADDITION_SUBSCRIPTION, {
+              params: { adsId, status },
+            })
+          }
+          title="Extend Ads"
+          style={[
+            styles.buttonPrimary,
+            {
+              paddingVertical: 8,
+              height: 40,
+            },
+          ]}
+          type={'primary'}
+          textStyle={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: '500',
+          }}
+        />
+      </View>
+    );
+  } else if (status === 'Draft') {
+    return (
+      <View
+        style={[styles.flex, styles.wFull, styles.justifyCenter, styles.mt20]}>
+        <ZButton
+          onPress={() => {
+            if (stage === 'post') {
+              navigation.navigate('bottomTab', {
+                screen: stage,
+                params: { adsId },
+              });
+            } else {
+              navigation.navigate(stage, { params: { adsId } });
+            }
+          }}
+          title="Continue with Posting this Ads"
+          style={[
+            styles.buttonPrimary,
+            {
+              width: window.width * 0.85,
+              height: 40,
+            },
+          ]}
+          type={'primary'}
+          textStyle={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: '500',
+            textAlign: 'center',
+          }}
+        />
+      </View>
+    );
+  } else if (status === 'Payment Pending') {
+    return (
+      <View
+        style={[styles.flex, styles.wFull, styles.justifyCenter, styles.mt20]}>
+        <ZButton
+          onPress={() => navigation.navigate(stage, { params: { adsId } })}
+          title="Complete Payment"
+          style={[
+            styles.buttonPrimary,
+            {
+              width: window.width * 0.85,
+              height: 40,
+            },
+          ]}
+          type={'primary'}
+          textStyle={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: '500',
+            textAlign: 'center',
+          }}
+        />
+      </View>
+    );
+  }
+  return null;
+};
+
+export default AdsCard;

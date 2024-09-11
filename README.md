@@ -1,165 +1,73 @@
-# Nestjs email authentication starter
-This project is an example of implementation of a user **email authentication** with [Nestjs](https://nestjs.com/) v8.4.6, [MongoDB](https://www.mongodb.com/) and [PassportJs](http://www.passportjs.org)
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+</p>
 
-It can be used as starter for a new project: it implements API for user sign-in/sign-up and features like **email verification**, **forgotten password**, **reset password**, **update profile** and **settings**.
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-# Getting started
-Install `nodejs` and `mongodb` in your machine.
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-Install dependencies with npm and run the application:
-``` 
-npm install
-npm run start
+## Description
+
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+
+## Installation
+
+```bash
+$ yarn install
 ```
 
-# Deploy using Docker
-⚠️ Before deploy the app in a container set the right **configuration** as explained in the section below, and then you can run:
-``` 
-docker-compose up -d
-```
-It will generate 3 containers: 
-- nestjs: nodejs application -> localhost:3000 (you can change the port in the docker-compose.yml)
-- mongodb: database -> expose 27017 in the container network but not reacheable from outside.
-- mongo-express: a web-based MongoDB admin interface -> localhost:8081
+## Running the app
 
-You can edit the config is in `docker-compose.yml`.  
-❗ Note: For security reason, remember to **change the db password** in docker-compose.yml and in config.ts file, and to **change the mongo-express password** to access the console.
+```bash
+# development
+$ yarn run start
 
+# watch mode
+$ yarn run start:dev
 
-# Configuration File
-You can find a `config.ts` file in the root of the project.   
-Before run the server set your **db configuration** (according you are using docker or not) and your :email: [Nodemailer](https://github.com/nodemailer/nodemailer) options to be able to send emails for registration:
-```
-# Docker Example #
-"db": {
-    "user": "root",
-    "pass": "example",
-    "host": "mongo",
-    "port": "27017",
-    "database": "testdb", 
-    "authSource": "admin"
-}
-
-# Local nodejs Example #
-"db": {
-   "user": null,
-   "pass": null,
-   "host": "localhost",
-   "port": "27017",
-   "database": "testdb",
-   "authSource": null
-}
-
-...  
-
-"host": {
-    "url": "<server-url>",  //This link is used to redirect users to your server to confirm their email address (link via email)
-    "port": "3000"
-},
-
-...
-
-"mail":{ 
-    "host": "<smtp-host>", //Nodemailer settings (go to the nodemailer documentation for further informations) - You need to set up this to make the signup api start working
-    "port": "<port>",
-    "secure": false,
-    "user": "<username>",
-    "pass": "<password>"
-}
+# production mode
+$ yarn run start:prod
 ```
 
-# API
-Server will listen on port `3000`, and it expose the following APIs:
+## Test
 
+```bash
+# unit tests
+$ yarn run test
 
-- **POST** - `/auth/email/register` - Register a new user
-  - **email** - *string*
-  - **password** - *string*
-  - **name** - *string (optional)*
-  - **surname** - *string (optional)*
+# e2e tests
+$ yarn run test:e2e
 
-- **POST** - `/auth/email/login` - Login user
-  - **email** - *string*
-  - **password** - *string*
-
-- **GET** - `/auth/email/verify/:token` - Validates the token sent in the email and activates the user's account
-
-- **GET** - `/auth/email/resend-verification/:email` - Resend verification email
-
-- **GET** - `/auth/email/forgot-password/:email` - Send a token via email to reset the password 
-
-- **POST** - `/auth/email/reset-password` - Change user password
-  - **newPassword** - *string*
-  - **newPasswordToken** - *string (token received by forgot-password api)*
-
-- **GET** - `/auth/users` - Returns all users (must be logged in)
-
-- **GET** - `/users/user/:email` - Returns selected user info (must be logged in)
-
-- **POST** - `/users/profile/update` - Update user info
-  - **name** - *string*
-  - **surname** - *string*
-  - **phone** - *string*
-  - **email** - *string*
-  - **birthdaydate** - *Date*
-  - **profilepicture** - *string (base64)*
-
-- **POST** - `/users/gallery/update` -  Add/Remove user photos
-  - **email** - *string*
-  - **action** - *string ('add' or 'remove')*
-  - **newPhoto** - *object* (only for case 'add')
-    - **imageData** - *string (base64)*
-    - **description** - *string*
-  - **photoId** - *string (base64)* (only for case 'remove')
-
-- **POST** - `settings/update` - Update user settings
-  - **email** - *string*
-  - **settingsKey1** - *string (Value1)*
-  - **settingsKey2** - *string (Value2)*
-  - **...**
-  
-
-# Passport JWT strategy
-This project use JSON Web Token ([JWT](https://www.npmjs.com/package/passport-jwt)) Bearer Token as authentication strategy for Passport. 
-The login API returns an access_token that you have to use to send a correct authorization header in calls that require authentication. You can find an example with postman [here](https://www.getpostman.com/docs/v6/postman/sending_api_requests/authorization)
-
-Login response:
-```
-{
-   ...
-  "data": {
-      "token": {
-          "expires_in": "3600",
-          "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...._DkYJJh4s"
-      },
-  ...
-}
+# test coverage
+$ yarn run test:cov
 ```
 
-Authorization header example:
-```
- Authorization → Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...._DkYJJh4s
-```
-# Logger
-All request and response are logged so this can help you to debug in production. 
-If you use pm2 as process manager, I suggest you to install [pm2-logrotate](https://github.com/keymetrics/pm2-logrotate) in your server.
+## Support
 
-# Security
-The project implements some of nodejs [security techniques](https://docs.nestjs.com/techniques/security) :
-- [Helmet](https://github.com/helmetjs/helmet) : can help protect your app from some well-known web vulnerabilities by setting HTTP headers appropriately
-- [Express Rate Limit](https://github.com/nfriedly/express-rate-limit): to protect your applications from brute-force attacks
-  - In the main.ts you can set a limit of requests in a time window (default is 100 requests in 15 minutes for all endpoints, and 3 requests in a 1 hour for sign up endpoint)
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-# Contributing
-If you want to contribute to this starter, consider:
+## Stay in touch
 
-- Reporting bugs and errors
-- Improve the documentation
-- Creating new features and pull requests
+- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
 
-<a href="https://www.buymeacoffee.com/marcomelilli"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=marcomelilli&button_colour=FF5F5F&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"></a>
+## License
 
-All contributions are welcome!
-
-# Copyright
-Licensed under the MIT license.
+Nest is [MIT licensed](LICENSE).

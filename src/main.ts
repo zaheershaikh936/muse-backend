@@ -1,26 +1,23 @@
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import { join } from 'path';
-import * as express from 'express';
-import { AllExceptionsFilter } from './common/filters/all-exception.filter';
-import * as helmet from 'helmet';
-import * as rateLimit from 'express-rate-limit';
-
-
-
+import { Logger, ValidationPipe } from '@nestjs/common';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import 'src/utils/logs'
+import { GlobalExceptionFilter, ResponseInterceptor } from './utils/common/interceptor';
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.use('/public', express.static(join(__dirname, '../../public')));
-  var bodyParser = require('body-parser');
-  app.use(bodyParser.json({limit: '5mb'}));
-  app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
-  app.useGlobalFilters(new AllExceptionsFilter());
+  const port = process.env.PORT || 8080
+  const app = await NestFactory.create(AppModule, { cors: true, bufferLogs: true, logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
-  /* SECURITY */
-  app.enable("trust proxy");
+  app.setGlobalPrefix('api/v1/');
+  //! /* SECURITY */
+  app.enableCors();
   app.use(helmet());
 
+  //? Rate Limit Middleware
   app.use(rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
@@ -34,8 +31,8 @@ async function bootstrap() {
       "Too many accounts created from this IP, please try again after an hour"
   });
   app.use("/auth/email/register", createAccountLimiter);
-  /******/
-
-  await app.listen(3000);
+  await app.listen(port);
+  Logger.verbose('Server started on port http://localhost:8080');
 }
+
 bootstrap();
