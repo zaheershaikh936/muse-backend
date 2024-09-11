@@ -8,8 +8,8 @@
   "scripts": {
     "build:nest": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "build": "npm i -g @nestjs/cli tsc",
+    "start": "node ./dist/src/main.js",
+    "build": "tsc",
     "start:nest": "nest start",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
