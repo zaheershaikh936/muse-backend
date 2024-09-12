@@ -1,7 +1,7 @@
-import { Controller, Get, Logger, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LoggingInterceptor } from 'src/utils/common/interceptor/logging.interceptor';
-
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller()
 @UseInterceptors(LoggingInterceptor)
 export class AppController {

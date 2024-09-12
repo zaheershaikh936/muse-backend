@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas';
 import { UsersModule } from '../index'
+import { JwtStrategy } from 'src/utils/common/auth/strategy/jwt.strategy';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,7 +21,7 @@ import { UsersModule } from '../index'
     }),
     forwardRef(() => UsersModule)
   ],
-  providers: [LoginService, LogoutService, RegisterService],
-  controllers: [AuthController]
+  providers: [LoginService, LogoutService, RegisterService, JwtStrategy],
+  controllers: [AuthController],
 })
 export class AuthModule { }

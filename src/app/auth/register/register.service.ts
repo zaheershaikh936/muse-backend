@@ -8,6 +8,7 @@ export class RegisterService {
         private readonly jwtService: JwtService,
         private readonly userService: UsersService
     ) { }
+
     async create(registerDTO: RegisterDTO) {
         const isExist = await this.userService.isExist(registerDTO.email)
         if (isExist) throw new UnauthorizedException('User already exist')

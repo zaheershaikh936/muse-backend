@@ -1,16 +1,22 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "src/main.ts",
-        "use": "@vercel/node"
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/src/main.js",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["dist/**"] }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/src/main.js",
+      "methods": ["GET", "POST", "PATCH", "DELETE"],
+      "headers": {
+        "Access-Control-Allow-Origin": "https://muse-233s.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, X-Requested-With"
       }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "src/main.ts",
-        "methods": ["GET", "POST", "PUT", "DELETE"]
-      }
-    ]
-  }
+    }
+  ]
+}

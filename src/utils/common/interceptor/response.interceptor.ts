@@ -17,6 +17,7 @@ export class ResponseInterceptor implements NestInterceptor {
                 const response = ctx.getResponse();
 
                 return {
+                    success: true,
                     status: response.statusCode, // Extract status from response
                     data: data, // The actual response data
                     message: 'Request successful', // You can customize the message if needed
