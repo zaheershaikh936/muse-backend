@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { ProfessionService } from './profession/profession.service';
 import { CreateProfessionDto } from './dto/profession.dto';
 import { AuthGuard } from '@nestjs/passport';
-@UseGuards(AuthGuard('jwt'))
 @Controller('profession')
 export class ProfessionController {
   constructor(private readonly professionService: ProfessionService) { }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   create(@Body() createProfessionDto: CreateProfessionDto) {
     return this.professionService.create(createProfessionDto);
