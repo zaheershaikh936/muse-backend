@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { RegisterService } from './register/register.service';
 import { LoginDTO, RegisterDTO } from './dto';
 import { LoginService } from './login/login.service';
@@ -8,16 +8,17 @@ export class AuthController {
     constructor(private registerService: RegisterService, private loginService: LoginService) { }
 
     @Post('/login')
+
     async login(@Body() loginDto: LoginDTO, @Res({ passthrough: true }) response: Response) {
         const data = await this.loginService.login(loginDto)
-        response.cookie('refresh_token', data.token.refreshToken, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 7 * 24 * 60 * 60 * 1000 })
+        response.cookie('refresh_token', data.token.refreshToken, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 })
         return data
     }
 
     @Get('/access-token')
-    refreshToken(@Req() request: Request, @Res({ passthrough: true }) response: any) {
+    refreshToken(@Req() request: Request) {
         const refreshToken = request.cookies['refresh_token'];
-        if (!refreshToken) throw new Error('Please login again')
+        if (String(typeof request.cookies) === "object") throw new HttpException('Your are not authenticated. Please try to login.', HttpStatus.NOT_ACCEPTABLE);
         return this.registerService.generateAccessToken(refreshToken)
     }
 

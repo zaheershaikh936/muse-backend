@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose'
 
@@ -9,6 +10,9 @@ export class Profession {
 
     @Prop({ required: true, default: "" })
     image: string;
+
+    @Prop({ required: false })
+    slag: string;
 
     @Prop({ required: true, default: "" })
     sort: number;
@@ -27,3 +31,15 @@ export class Profession {
 }
 
 export const ProfessionSchema = SchemaFactory.createForClass(Profession);
+
+ProfessionSchema.pre('save', async function (next) {
+    if (this.isModified('name')) {
+        try {
+            const name: any = this.name;
+            this.slag = name.trim().replace(/\s+/g, '-').toLowerCase();
+        } catch (error) {
+            return error
+        }
+    }
+    next();
+})

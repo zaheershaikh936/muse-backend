@@ -21,6 +21,9 @@ export class Role {
     @Prop({ required: true, unique: true, searchIndex: true })
     name: string;
 
+    @Prop({ required: true })
+    slag: string
+
     @Prop({ required: true, default: "" })
     sort: number;
 
@@ -53,3 +56,15 @@ RoleSchema.pre('save', async function (next) {
     }
     next();
 });
+
+RoleSchema.pre('save', async function (next) {
+    if (this.isModified('name')) {
+        try {
+            const name: any = this.name;
+            this.slag = name.trim().replace(/\s+/g, '-').toLowerCase();
+        } catch (error) {
+            return error
+        }
+    }
+    next();
+})

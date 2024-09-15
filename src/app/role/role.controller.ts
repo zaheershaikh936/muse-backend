@@ -18,9 +18,4 @@ export class RoleController {
     return this.roleService.findOne(id)
   }
 
-
-  @Get('/profession/:professionId')
-  findByProfession(@Param('professionId') professionId: string) {
-    return this.roleService.findByProfession(professionId)
-  }
 }

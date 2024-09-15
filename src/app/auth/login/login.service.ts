@@ -19,7 +19,7 @@ export class LoginService {
         const accessToken = this.registerService.generateToken({ email: user.email, _id: String(user._id), role: user.role })
         const refreshToken = this.registerService.generateRefreshToken({ email: user.email, _id: String(user._id), role: user.role })
         return {
-            user: { name: user.name, email: user.email, role: user.role }, token: {
+            user: { sub: user._id, name: user.name, isMentor: user.isMentor, email: user.email, role: user.role, image: user.image }, token: {
                 accessToken, refreshToken
             }
         }

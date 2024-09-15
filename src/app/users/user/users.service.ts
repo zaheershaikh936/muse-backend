@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas';
 import { Model } from 'mongoose';
@@ -24,10 +24,10 @@ export class UsersService {
   }
 
   findByEmail(email: string) {
-    return this.userModel.findOne({ email }, { _id: 1, email: 1, password: 1 }).lean()
+    return this.userModel.findOne({ email }, { _id: 1, email: 1, password: 1, name: 1, isMentor: 1, image: 1 }).lean()
+  }
+
+  update(id: string, updateUserDto: UpdateUserDto) {
+    return this.userModel.findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true }).lean();
   }
 }
-function compareSync(password: string, password1: any) {
-  throw new Error('Function not implemented.');
-}
-

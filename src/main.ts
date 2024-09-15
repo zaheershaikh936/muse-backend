@@ -4,11 +4,17 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import 'src/utils/logs'
+import * as cookieParser from 'cookie-parser';
 import { GlobalExceptionFilter, ResponseInterceptor } from './utils/common/interceptor';
 async function bootstrap() {
   const port = process.env.PORT || 8080
   const app = await NestFactory.create(AppModule, { cors: true, bufferLogs: true, logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
+  app.use(cookieParser());
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
 

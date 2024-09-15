@@ -15,7 +15,6 @@ export class ResponseInterceptor implements NestInterceptor {
                 // You can access the request/response context if needed
                 const ctx = context.switchToHttp();
                 const response = ctx.getResponse();
-
                 return {
                     success: true,
                     status: response.statusCode, // Extract status from response

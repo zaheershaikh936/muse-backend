@@ -17,6 +17,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         } else {
             message = 'Something went wrong'
         }
+
         response.status(status).json({
             success: false,
             status: status,

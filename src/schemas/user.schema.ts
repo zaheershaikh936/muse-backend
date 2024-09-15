@@ -7,7 +7,6 @@ export class User {
     @Prop({ required: true, unique: true, searchIndex: true })
     email: string;
 
-    //don pass pass this field
     @Prop({ required: true, select: false, hidden: true })
     password: string;
 
@@ -16,6 +15,12 @@ export class User {
 
     @Prop({ required: true, searchIndex: true })
     name: string;
+
+    @Prop({ default: false })
+    isMentor: boolean;
+
+    @Prop({ default: '' })
+    image: string;
 
     @Prop({ default: Date.now })
     createdAt: Date;
