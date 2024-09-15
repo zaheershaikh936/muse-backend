@@ -1,22 +1,21 @@
-import { IsBoolean, IsOptional, IsString } from "class-validator"
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
-    password: string
+  password: string;
 }
 
-
 export class UpdateUserDto {
-    @IsString()
-    @IsOptional()
-    name: string
+  @IsString()
+  @IsOptional()
+  name: string;
 
-    @IsString()
-    @IsOptional()
-    image: string
+  @IsString()
+  @IsOptional()
+  image: string;
 
-    @IsBoolean()
-    @IsOptional()
-    isMentor: boolean
+  @IsBoolean()
+  @IsOptional()
+  isMentor: boolean;
 
-    updatedAt: Date
+  updatedAt: Date;
 }

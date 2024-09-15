@@ -4,7 +4,7 @@ import { CreateProfessionDto } from './dto/profession.dto';
 import { AuthGuard } from '@nestjs/passport';
 @Controller('profession')
 export class ProfessionController {
-  constructor(private readonly professionService: ProfessionService) { }
+  constructor(private readonly professionService: ProfessionService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()

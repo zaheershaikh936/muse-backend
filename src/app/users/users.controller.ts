@@ -1,23 +1,22 @@
-import { Controller, Body, UseGuards, Patch, Res, Logger, Req, Param } from '@nestjs/common';
+import { Controller, Body, UseGuards, Patch, Param } from '@nestjs/common';
 import { UsersService } from './user/users.service';
 import { UpdateUserDto } from './dto/user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import { JwtAuthGuard } from 'src/utils/guard/jwt-user.guards';
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Patch(":id")
+  @Patch(':id')
   async update(@Body() updateUserDto: UpdateUserDto, @Param('id') id: string) {
     try {
-      updateUserDto.updatedAt = new Date()
-      return this.usersService.update(id, updateUserDto)
+      updateUserDto.updatedAt = new Date();
+      return this.usersService.update(id, updateUserDto);
     } catch (error) {
-      console.log(error)
-      return error
+      console.log(error);
+      return error;
     }
   }
 }
