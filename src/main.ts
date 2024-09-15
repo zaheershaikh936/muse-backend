@@ -17,10 +17,7 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({
-    origin: 'https://muse-backend-dun.vercel.app',
-    credentials: true,
-  });
+  app.enableCors();
   app.use(cookieParser());
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
