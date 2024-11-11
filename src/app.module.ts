@@ -8,6 +8,10 @@ import {
   AuthModule,
   ProfessionModule,
   RoleModule,
+  MentorModule,
+  AppConfigModule,
+  AvailabilityModule,
+  BookingsModule
 } from './app';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
@@ -21,6 +25,10 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
     AuthModule,
     ProfessionModule,
     RoleModule,
+    MentorModule,
+    AppConfigModule,
+    AvailabilityModule,
+    BookingsModule
   ],
   controllers: [AppController],
   providers: [

@@ -9,23 +9,52 @@ import {
   GlobalExceptionFilter,
   ResponseInterceptor,
 } from './utils/common/interceptor';
+import { corsOptions } from 'src/utils/cors';
 async function bootstrap() {
   const port = process.env.PORT || 8080;
   const app = await NestFactory.create(AppModule, {
-    cors: true,
     bufferLogs: true,
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
-  app.use(cookieParser());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
+  app.enableCors({
+    origin: corsOptions.origin,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders:
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+    maxAge: 86400,
+    exposedHeaders: 'Authorization',
+  });
+  app.use(
+    cookieParser({
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      signed: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      overwrite: true,
+    }),
+  );
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
-
   app.setGlobalPrefix('api/v1/');
   //! /* SECURITY */
-  app.enableCors();
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
 
   //? Rate Limit Middleware
   app.use(
@@ -43,7 +72,7 @@ async function bootstrap() {
   });
   app.use('/auth/email/register', createAccountLimiter);
   await app.listen(port);
-  Logger.verbose('Server started on port http://localhost:8080');
+  Logger.verbose(`Server started on port http://localhost:${process.env.PORT}`);
 }
 
 bootstrap();

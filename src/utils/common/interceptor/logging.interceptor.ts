@@ -9,7 +9,7 @@ import { CallHandler } from '@nestjs/common';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
     const now = Date.now();
     Logger.debug(`After... ${Date.now() - now}ms`);
     return next.handle().pipe();

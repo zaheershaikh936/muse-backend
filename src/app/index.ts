@@ -5,6 +5,10 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/user/users.service';
 import { ProfessionModule } from './profession/profession.module';
 import { RoleModule } from './role/role.module';
+import { MentorModule } from './mentor/mentor.module';
+import { AppConfigModule } from './config/config.module';
+import { AvailabilityModule } from './availability/availability.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 export {
   AuthModule,
@@ -14,4 +18,8 @@ export {
   UsersService,
   ProfessionModule,
   RoleModule,
+  MentorModule,
+  AppConfigModule,
+  AvailabilityModule,
+  BookingsModule,
 };

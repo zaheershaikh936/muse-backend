@@ -34,4 +34,13 @@ export class UsersService {
       .findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
       .lean();
   }
+
+  findOneForBooking(id: string) {
+    return this.userModel
+      .findOne(
+        { _id: id },
+        { _id: 1, email: 1, name: 1, image: 1 },
+      )
+      .lean();
+  }
 }

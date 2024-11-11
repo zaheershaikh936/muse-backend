@@ -28,20 +28,22 @@ export class AuthController {
     response.cookie('refresh_token', data.token.refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return data;
   }
 
   @Get('/access-token')
-  refreshToken(@Req() request: Request) {
+  async refreshToken(@Req() request: Request) {
     const refreshToken = request.cookies['refresh_token'];
-    if (String(typeof request.cookies) === 'object')
+    if (!request.cookies.refresh_token)
       throw new HttpException(
         'Your are not authenticated. Please try to login.',
         HttpStatus.NOT_ACCEPTABLE,
       );
+    const isValid = await this.registerService.verifyRefreshToken(refreshToken);
+    if (!isValid)
+      throw new HttpException('Invalid token', HttpStatus.FORBIDDEN);
     return this.registerService.generateAccessToken(refreshToken);
   }
 

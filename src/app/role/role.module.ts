@@ -10,5 +10,6 @@ import { Role, RoleSchema } from 'src/schemas';
   ],
   controllers: [RoleController],
   providers: [RoleService],
+  exports: [RoleService],
 })
 export class RoleModule {}

@@ -18,16 +18,13 @@ export class LoginService {
     const isValid = compareSync(loginDto.password, user.password);
     if (!isValid)
       throw new HttpException('Invalid password', HttpStatus.NOT_ACCEPTABLE);
-    const accessToken = this.registerService.generateToken({
+    const userData = {
       email: user.email,
       _id: String(user._id),
       role: user.role,
-    });
-    const refreshToken = this.registerService.generateRefreshToken({
-      email: user.email,
-      _id: String(user._id),
-      role: user.role,
-    });
+    };
+    const accessToken = this.registerService.generateToken(userData);
+    const refreshToken = this.registerService.generateRefreshToken(userData);
     return {
       user: {
         sub: user._id,

@@ -23,6 +23,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message;
     if (exception?.response) {
       message = exception?.response;
+    } else if (exception.errors) {
+      message = exception.errors;
+    } else if (exception.message) {
+      message = exception.message;
     } else {
       message = 'Something went wrong';
     }

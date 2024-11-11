@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Param } from '@nestjs/common';
 import { ProfessionService } from './profession/profession.service';
 import { CreateProfessionDto } from './dto/profession.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -20,5 +20,11 @@ export class ProfessionController {
   @Get('/roles')
   getRoles() {
     return this.professionService.getRoles();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:id/roles')
+  getRolesByProfession(@Param('id') id: string) {
+    return this.professionService.getRolesByProfession(id);
   }
 }

@@ -1,0 +1,75 @@
+import { Injectable } from '@nestjs/common';
+import { CreateAvailabilityDto } from '../dto/create-availability.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Availability } from 'src/schemas/availability.schema';
+import { Model } from 'mongoose';
+import mongoose from 'mongoose';
+import { updateAvailability } from 'src/utils/helper/merge.time.slot'
+const { ObjectId } = mongoose.Types;
+@Injectable()
+export class AvailabilityService {
+  constructor(
+    @InjectModel(Availability.name)
+    private availabilityModel: Model<Availability>,
+  ) { }
+  create(createAvailabilityDto: CreateAvailabilityDto) {
+    try {
+      return this.availabilityModel.create(createAvailabilityDto);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  findOne(id: string, day: string) {
+    return this.availabilityModel.findOne({ mentorId: new ObjectId(id) }, { mentor: 1, [`availability.${day}`]: 1 }).lean().exec();
+  }
+
+
+  findAllAvailability(id: string) {
+    return this.availabilityModel.findOne({ userId: new ObjectId(id) }, { _id: 1, availability: 1 }).lean().exec();
+  }
+
+  async updateOne(id: string, body: any) {
+    const { availability, _id } = await this.findAllAvailability(id);
+    const updateAvailabilityData = updateAvailability(availability, body)
+    return this.availabilityModel.findByIdAndUpdate(_id, { availability: updateAvailabilityData }, { new: true }).lean().exec();
+  }
+
+
+  getAvailableSlots(availability: any[], bookings: any[]) {
+    const currentDate = new Date();
+    const slots = [];
+    availability.forEach(slot => {
+      const { startTime, endTime } = slot;
+      let current = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        ...startTime.split(':').map(Number)
+      );
+      const end = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        ...endTime.split(':').map(Number)
+      );
+      while (current < end) {
+        const nextSlot = new Date(current.getTime() + 30 * 60 * 1000);
+        const isBooked = bookings.some(booking => {
+          return new Date(booking.start_time) <= current && new Date(booking.end_time) > current;
+        });
+        if (!isBooked) {
+          slots.push({
+            start_time_string: current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            end_time_string: nextSlot.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            start_time: new Date(current),
+            end_time: new Date(nextSlot)
+          });
+        }
+        current = nextSlot;
+      }
+    });
+    return slots;
+  }
+}

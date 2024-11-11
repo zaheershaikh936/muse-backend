@@ -50,9 +50,15 @@ export class RegisterService {
 
   generateRefreshToken(user: { email: string; _id: string; role: string }) {
     return this.jwtService.sign(user, {
-      expiresIn: '7d',
+      expiresIn: '30d',
       secret: process.env.JWT_SECRET,
       algorithm: 'HS512',
+    });
+  }
+
+  verifyRefreshToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET,
     });
   }
 }
