@@ -6,6 +6,7 @@ import {
   Req,
   Get,
   Param,
+  Query,
 } from '@nestjs/common';
 import { MentorService } from './mentor/mentor.service';
 import { ProfileService } from './profile/profile.service';
@@ -23,6 +24,8 @@ import { ExperienceMentorDto } from './dto/experience.dto';
 import { RoleService } from '../role/role/role.service';
 import { User } from 'src/utils/decorator/user.decorator';
 import { GetMentorDto } from './dto/mentor.dto';
+import { MentorBookingService } from '../bookings/mentor-booking/bookingsMentor.service';
+import { AuthGuard } from '@nestjs/passport';
 @Controller('mentor')
 export class MentorController {
   constructor(
@@ -30,7 +33,20 @@ export class MentorController {
     private readonly experienceService: ExperienceService,
     private readonly profileService: ProfileService,
     private readonly roleService: RoleService,
+    private readonly bookingService: MentorBookingService,
   ) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/bookings')
+  async mentorBooking(@User('_id') id: string, @Query('status') status: string, @Query('limit') limit: number, @Query('page') page: number) {
+    const filter = {
+      status: status?.length ? status.split(',') : [],
+      limit: limit || 10,
+      page: page || 1,
+    }
+    const mentor = await this.mentorService.getMentorIdByUserId(id);
+    return this.bookingService.mentorBookings(mentor._id.toString(), filter)
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('/profile')
@@ -169,5 +185,12 @@ export class MentorController {
   @Get('/:id')
   async getMentorById(@Param('id') id: string) {
     return this.mentorService.getMentorById(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/bookings/kpi')
+  async bookingMentorKpi(@User('_id') id: any) {
+    const mentor = await this.mentorService.getMentorIdByUserId(id)
+    return this.bookingService.bookingKpi(mentor._id.toString())
   }
 }

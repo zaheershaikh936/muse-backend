@@ -10,6 +10,7 @@ import {
   ResponseInterceptor,
 } from './utils/common/interceptor';
 import { corsOptions } from 'src/utils/cors';
+
 async function bootstrap() {
   const port = process.env.PORT || 8080;
   const app = await NestFactory.create(AppModule, {
@@ -25,16 +26,15 @@ async function bootstrap() {
       },
     }),
   );
+
   app.enableCors({
     origin: corsOptions.origin,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders:
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+      '*',
     preflightContinue: false,
     optionsSuccessStatus: 200,
-    maxAge: 86400,
-    exposedHeaders: 'Authorization',
   });
   app.use(
     cookieParser({

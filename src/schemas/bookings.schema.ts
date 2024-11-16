@@ -59,7 +59,7 @@ export class Booking {
         endTime: Date;
     };
 
-    @Prop({ type: String, enum: ['pending', 'paid', 'confirmed', 'canceled'], default: 'pending' })
+    @Prop({ type: String, enum: ['pending', 'paid', 'accepted', 'cancelled', 'completed'], default: 'pending' })
     status: string;
 
     @Prop({ type: Number, required: true })

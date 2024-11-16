@@ -2,67 +2,67 @@
 // const { ObjectId } = require('mongodb');
 // module.exports = {
 //   async up(db, client) {
-//     // const result =[]
-//     // for await (const item of data){
-//     //     const name = item['full name']
-//     //     const emailArray = name.split(" ")
-//     //   let email;
-//     //   // //! email
-//     //   for (let index = 0; index < emailArray.length; index++) {
-//     //     const element = emailArray[index];
-//     //     if(emailArray.length > 1){
-//     //       if(index === 0){
-//     //         email = element.toLowerCase();
-//     //       }else{
-//     //         email = `${email}${element}@gmail.com`
-//     //       }
-//     //     }else{
-//     //       email = `${element}@gmail.com`
-//     //     }
-//     //   }
-//     //   const user = await db.collection('users').findOne({email: email})
-//     //   if(user){
-//     //   const professionsData = await db.collection("professions").findOne({_id: new ObjectId(item.profession._id)});
-//     //   const roleDate = await db.collection("roles").find({"profession._id": new ObjectId(item.profession._id)}).toArray();
-//     //   const skills = getSkills(item)
-//     //   const experience = getExperience(item)
-//     //   const role = extractRandomRole(roleDate, item.role)
-//     //   result.push({
-//     //     userId: new ObjectId(user._id),
-//     //     skills,
-//     //     deleted: false,
-//     //     ratings: item.ratings,
-//     //     verified: true,
-//     //     banned: false,
-//     //     experience: experience,
-//     //     createdAt: new Date(),
-//     //     updatedAt: new Date(),
-//     //     bio: item.bio,
-//     //     location: {
-//     //       city: item.city,
-//     //       country: item.country,
-//     //       flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
-//     //     },
-//     //     profession: {
-//     //       _id: new ObjectId(item.profession._id),
-//     //       name: item.profession.name,
-//     //       slag: professionsData?.slag
-//     //     },
-//     //     role:{
-//     //       _id: new ObjectId(role.role._id),
-//     //       name: role.role.name,
-//     //       slag: role.role.slag
-//     //     },
-//     //     about: item.bio,
-//     //     user:{
-//     //       name: user.name,
-//     //       email: user.email,
-//     //       image: user.image
-//     //     },
-//     //     tag: item.tab
-//     //   })
-//     //   }
-//     // }
+//     const result =[]
+//     for await (const item of data){
+//         const name = item['full name']
+//         const emailArray = name.split(" ")
+//       let email;
+//       // //! email
+//       for (let index = 0; index < emailArray.length; index++) {
+//         const element = emailArray[index];
+//         if(emailArray.length > 1){
+//           if(index === 0){
+//             email = element.toLowerCase();
+//           }else{
+//             email = `${email}${element}@gmail.com`
+//           }
+//         }else{
+//           email = `${element}@gmail.com`
+//         }
+//       }
+//       const user = await db.collection('users').findOne({email: email})
+//       if(user){
+//       const professionsData = await db.collection("professions").findOne({_id: new ObjectId(item.profession._id)});
+//       const roleDate = await db.collection("roles").find({"profession._id": new ObjectId(item.profession._id)}).toArray();
+//       const skills = getSkills(item)
+//       const experience = getExperience(item)
+//       const role = extractRandomRole(roleDate, item.role)
+//       result.push({
+//         userId: new ObjectId(user._id),
+//         skills,
+//         deleted: false,
+//         ratings: item.ratings,
+//         verified: true,
+//         banned: false,
+//         experience: experience,
+//         createdAt: new Date(),
+//         updatedAt: new Date(),
+//         bio: item.bio,
+//         location: {
+//           city: item.city,
+//           country: item.country,
+//           flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
+//         },
+//         profession: {
+//           _id: new ObjectId(item.profession._id),
+//           name: item.profession.name,
+//           slag: professionsData?.slag
+//         },
+//         role:{
+//           _id: new ObjectId(role.role._id),
+//           name: role.role.name,
+//           slag: role.role.slag
+//         },
+//         about: item.bio,
+//         user:{
+//           name: user.name,
+//           email: user.email,
+//           image: user.image
+//         },
+//         tag: item.tab
+//       })
+//       }
+//     }
 
 //     // await db.collection('mentors').insertMany(result)
 //     console.log('okay');

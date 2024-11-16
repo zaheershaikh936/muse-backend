@@ -79,4 +79,8 @@ export class MentorService {
   findOneForBooking(id: string) {
     return this.mentorModel.findById(id, { _id: 1, user: 1 }).lean().exec();
   }
+
+  getMentorIdByUserId(id: string) {
+    return this.mentorModel.findOne({ userId: new ObjectId(id) }, { _id: 1 }).lean().exec();
+  }
 }

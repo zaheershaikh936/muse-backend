@@ -11,6 +11,7 @@ import {
   MentorSchema,
 } from 'src/schemas';
 import { RoleModule } from '../role/role.module';
+import { BookingsModule } from '../bookings/bookings.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RoleModule } from '../role/role.module';
       { name: Experience.name, schema: ExperienceSchema },
     ]),
     forwardRef(() => RoleModule),
+    forwardRef(() => BookingsModule),
   ],
   controllers: [MentorController],
   providers: [MentorService, ProfileService, ExperienceService],

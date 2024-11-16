@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseGuards, Param, Patch, Get } from '@nestjs/common';
-import { BookingsService } from './bookings.service';
+import { BookingsService } from './booking/bookings.service';
 import { CreateBookingDto } from './dto/booking.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/utils/decorator/user.decorator';
@@ -38,9 +38,14 @@ export class BookingsController {
     return this.bookingsService.createBooking(createBookingDto);
   }
 
+  @Patch('/cancel/:id/booking')
+  async CancelBooking(@Param() id: string) {
+    return this.bookingsService.updateBookingStatus(id, "cancelled");
+  }
+
   @Patch('/conform/:id/booking')
   async ConformBooking(@Param() id: string) {
-    return this.bookingsService.updateConformBooking(id);
+    return this.bookingsService.updateBookingStatus(id, "accepted");
   }
 
   @Get('/:url')

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBookingDto } from './dto/booking.dto';
+import { CreateBookingDto } from '../dto/booking.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Booking } from 'src/schemas';
 import { Model } from 'mongoose';
@@ -23,8 +23,8 @@ export class BookingsService {
       });
   }
 
-  async updateConformBooking(_id: string) {
-    const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(_id) }, { $set: { updatedAt: new Date(), status: "confirmed" } }, { new: true });
+  async updateBookingStatus(_id: string, status: string) {
+    const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(_id) }, { $set: { updatedAt: new Date(), status: status.toLowerCase() } }, { new: true });
     const uniqueUrl = encryptBookingData(data?._id.toString(), data?.booking?.startTime.toString(), data?.booking?.endTime.toString())
     await this.bookingModel.updateOne({ _id: new ObjectId(_id) }, { $set: { uniqueUrl } });
     return data;

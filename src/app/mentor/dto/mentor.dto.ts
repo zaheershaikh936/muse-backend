@@ -18,3 +18,10 @@ export class GetMentorDto {
   @IsOptional()
   sort: any;
 }
+
+
+export type MentorFilterType = {
+  status?: string[];
+  limit?: number;
+  page?: number;
+};

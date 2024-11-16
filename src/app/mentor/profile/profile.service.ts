@@ -65,7 +65,7 @@ export class ProfileService {
           name: '$user.name',
           image: '$user.image',
           about: 1,
-          Profession: 1,
+          profession: 1,
         },
       },
     ]);
