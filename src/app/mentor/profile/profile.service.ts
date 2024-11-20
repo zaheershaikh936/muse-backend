@@ -8,6 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Mentor } from 'src/schemas';
 import mongoose, { Model } from 'mongoose';
+import { ExperienceMentorDto } from '../dto/experience.dto';
 const ObjectId = mongoose.Types.ObjectId;
 
 @Injectable()
@@ -50,6 +51,37 @@ export class ProfileService {
         },
       },
       {
+        $addFields: {
+          profileCompletion: {
+            $multiply: [
+              {
+                $divide: [
+                  {
+                    $sum: [
+                      { $cond: [{ $ifNull: ['$user.image', false] }, 10, 0] },
+                      { $cond: [{ $ifNull: ['$bgImage', false] }, 5, 0] },
+                      { $cond: [{ $ifNull: ['$user.name', false] }, 5, 0] },
+                      { $cond: [{ $ifNull: ['$user.email', false] }, 5, 0] },
+                      { $cond: [{ $ifNull: ['$bio', false] }, 10, 0] },
+                      { $cond: [{ $ifNull: ['$about', false] }, 10, 0] },
+                      { $cond: [{ $gt: [{ $size: '$skills' }, 0] }, 10, 0] },
+                      { $cond: [{ $gt: [{ $size: '$experience' }, 0] }, 15, 0] },
+                      { $cond: [{ $ifNull: ['$location', false] }, 10, 0] },
+                      { $cond: [{ $ifNull: ['$profession.name', false] }, 5, 0] },
+                      { $cond: [{ $ifNull: ['$role.name', false] }, 5, 0] },
+                      { $cond: [{ $ifNull: ['$tag', false] }, 5, 0] },
+                      { $cond: [{ $ifNull: ['$totalExperience', false] }, 5, 0] },
+                    ],
+                  },
+                  100,
+                ],
+              },
+              100,
+            ],
+          },
+        },
+      },
+      {
         $unwind: '$user',
       },
       {
@@ -65,7 +97,9 @@ export class ProfileService {
           name: '$user.name',
           image: '$user.image',
           about: 1,
+          role: 1,
           profession: 1,
+          profileCompletion: 1
         },
       },
     ]);
@@ -102,5 +136,57 @@ export class ProfileService {
       skillsMentorDto,
       { new: true },
     );
+  }
+
+
+  findMentorExperience(userId: string) {
+    return this.mentorModel.findOne({ userId: new ObjectId(userId) }, { experience: 1 }).lean().exec();
+  }
+
+  async updateExperience(experienceMentorDto: ExperienceMentorDto, id: string) {
+    const mentor = await this.findMentorExperience(experienceMentorDto.userId);
+    const title = experienceMentorDto.positions[experienceMentorDto.positions.length - 1].title;
+    const newExperienceEntry = {
+      image: experienceMentorDto.image,
+      company: experienceMentorDto.company,
+      role: title,
+      experienceId: id
+    };
+    const updatedExperience = [
+      ...mentor.experience,
+      newExperienceEntry
+    ];
+
+    await this.mentorModel.updateOne(
+      { userId: new ObjectId(experienceMentorDto.userId) },
+      { $set: { experience: updatedExperience } }
+    );
+    return
+  }
+
+  async findAndUpdateExperienceById(experienceMentorDto: ExperienceMentorDto, experienceId: string) {
+    const mentor = await this.findMentorExperience(experienceMentorDto.userId);
+    if (!mentor) {
+      throw new Error('Mentor not found');
+    }
+    const title = experienceMentorDto.positions[experienceMentorDto.positions.length - 1].title;
+    const experienceIndex = mentor.experience.findIndex(
+      (item: { experienceId: string }) => item.experienceId.toString() === experienceId
+    );
+    console.log('Experience index found:', experienceIndex);
+
+    if (experienceIndex !== -1) {
+      mentor.experience[experienceIndex] = {
+        ...mentor.experience[experienceIndex],
+        image: experienceMentorDto.image,
+        company: experienceMentorDto.company,
+        role: title
+      };
+    }
+    await this.mentorModel.updateOne(
+      { userId: new ObjectId(experienceMentorDto.userId) },
+      { $set: { experience: mentor.experience } }
+    );
+    return;
   }
 }

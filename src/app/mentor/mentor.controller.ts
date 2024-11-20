@@ -7,6 +7,7 @@ import {
   Get,
   Param,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { MentorService } from './mentor/mentor.service';
 import { ProfileService } from './profile/profile.service';
@@ -20,7 +21,7 @@ import {
 } from './dto/profile.dto';
 import { JwtAuthGuard } from 'src/utils/guard/jwt-user.guards';
 import { Request } from 'src/utils/types/index';
-import { ExperienceMentorDto } from './dto/experience.dto';
+import { ExperienceMentorDto, UpdateExperienceMentorDto } from './dto/experience.dto';
 import { RoleService } from '../role/role/role.service';
 import { User } from 'src/utils/decorator/user.decorator';
 import { GetMentorDto } from './dto/mentor.dto';
@@ -137,18 +138,35 @@ export class MentorController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/experience/id/:id')
+  async getExperienceById(@Param('id') id: string) {
+    return this.experienceService.getExperienceById(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/experience/:id')
+  async updateExperience(@User('_id') sub: string, @Param() id: string, @Body() experienceMentorDto: UpdateExperienceMentorDto) {
+    experienceMentorDto.userId = sub;
+    const data = await this.experienceService.update(id, experienceMentorDto);
+    if (data) await this.profileService.findAndUpdateExperienceById(experienceMentorDto, data?._id.toString())
+    return data;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('/experience')
   async createExperience(
     @User('_id') id: string,
     @Body() experienceMentorDto: ExperienceMentorDto,
   ) {
     experienceMentorDto.userId = id;
-    return this.experienceService.create(experienceMentorDto);
+    const data = await this.experienceService.create(experienceMentorDto);
+    if (data) await this.profileService.updateExperience(experienceMentorDto, data?._id)
+    return data;
   }
 
-  @Get('/experience/:id')
-  async getExperienceById(@Param('id') id: string) {
-    return this.experienceService.getExperienceById(id);
+  @Get('/experience/:mentorId')
+  async getExperienceByMentorId(@Param('mentorId') id: string) {
+    return this.experienceService.getExperienceByMentorId(id);
   }
 
   @Get('featured/mentors')

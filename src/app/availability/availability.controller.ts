@@ -22,13 +22,26 @@ export class AvailabilityController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() createAvailabilityDto: CreateAvailabilityDto, @User("_id") _id: string) {
-    createAvailabilityDto.userId = _id;
     const mentor = await this.mentorService.getMentorId(_id)
-    createAvailabilityDto.mentorId = mentor._id.toString();
-    createAvailabilityDto.mentor = mentor.user;
-    return this.availabilityService.create(createAvailabilityDto);
+    const mentorId: string = mentor._id.toString();
+    // check if the user has availability then update 
+    const availability = await this.availabilityService.findAvailability(mentorId)
+    if (!availability) {
+      createAvailabilityDto.userId = _id;
+      createAvailabilityDto.mentorId = mentorId
+      createAvailabilityDto.mentor = mentor.user;
+      return this.availabilityService.create(createAvailabilityDto);
+    } else {
+      return this.availabilityService.updateOne(availability.userId, createAvailabilityDto);
+    }
   }
 
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  getAvailability(@User("_id") id: string) {
+    return this.availabilityService.findMentorAvailability(id);
+  }
 
   @Get("/:id/:day")
   async getAvailabilityTimeSlot(@Param("id") id: string, @Param('day') day: string) {

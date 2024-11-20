@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Experience } from 'src/schemas';
 import { Model } from 'mongoose';
-import { ExperienceMentorDto } from '../dto/experience.dto';
+import { ExperienceMentorDto, UpdateExperienceMentorDto } from '../dto/experience.dto';
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 @Injectable()
@@ -164,7 +164,7 @@ export class ExperienceService {
     ]);
   }
 
-  async getExperienceById(id: string) {
+  async getExperienceByMentorId(id: string) {
     return await this.experienceModel.aggregate([
       {
         $match: {
@@ -266,6 +266,19 @@ export class ExperienceService {
           skills: 1,
         },
       },
+      {
+        $sort: {
+          _id: -1,
+        }
+      }
     ]);
+  }
+
+  async getExperienceById(id: string) {
+    return this.experienceModel.findById(id).lean().exec();
+  }
+
+  async update(id: string, updateExperienceDto: UpdateExperienceMentorDto) {
+    return this.experienceModel.findByIdAndUpdate({ _id: new ObjectId(id) }, { $set: updateExperienceDto }, { new: true }).lean().exec();
   }
 }

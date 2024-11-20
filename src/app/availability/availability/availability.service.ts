@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Availability } from 'src/schemas/availability.schema';
 import { Model } from 'mongoose';
 import mongoose from 'mongoose';
-import { updateAvailability } from 'src/utils/helper/merge.time.slot'
+// import { updateAvailability } from 'src/utils/helper/merge.time.slot'
 const { ObjectId } = mongoose.Types;
 @Injectable()
 export class AvailabilityService {
@@ -26,14 +26,18 @@ export class AvailabilityService {
   }
 
 
+  findAvailability(id: string) {
+    return this.availabilityModel.findOne({ mentorId: new ObjectId(id) }, { userId: 1 }).lean().exec();
+  }
+
   findAllAvailability(id: string) {
     return this.availabilityModel.findOne({ userId: new ObjectId(id) }, { _id: 1, availability: 1 }).lean().exec();
   }
 
   async updateOne(id: string, body: any) {
-    const { availability, _id } = await this.findAllAvailability(id);
-    const updateAvailabilityData = updateAvailability(availability, body)
-    return this.availabilityModel.findByIdAndUpdate(_id, { availability: updateAvailabilityData }, { new: true }).lean().exec();
+    // const { _id } = await this.findAllAvailability(id);
+    // const updateAvailabilityData = updateAvailability(availability, body)
+    return this.availabilityModel.findOneAndUpdate({ userId: new ObjectId(id) }, { availability: body.availability }, { new: true }).lean().exec();
   }
 
 
@@ -71,5 +75,10 @@ export class AvailabilityService {
       }
     });
     return slots;
+  }
+
+
+  findMentorAvailability(id: string) {
+    return this.availabilityModel.findOne({ userId: new ObjectId(id) }, { availability: 1 }).lean().exec();
   }
 }

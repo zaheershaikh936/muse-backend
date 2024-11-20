@@ -9,6 +9,8 @@ import { MentorModule } from './mentor/mentor.module';
 import { AppConfigModule } from './config/config.module';
 import { AvailabilityModule } from './availability/availability.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
+
 
 export {
   AuthModule,
@@ -22,4 +24,5 @@ export {
   AppConfigModule,
   AvailabilityModule,
   BookingsModule,
+  FileUploadModule,
 };

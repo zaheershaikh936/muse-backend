@@ -30,7 +30,6 @@ class Position {
 
 export class ExperienceMentorDto {
   userId: string;
-
   @IsString()
   @IsOptional()
   image: string;
@@ -59,5 +58,37 @@ export class ExperienceMentorDto {
 
   @IsArray()
   @IsNotEmpty()
+  skills: string[];
+}
+export class UpdateExperienceMentorDto {
+  userId: string;
+  @IsString()
+  @IsOptional()
+  image: string;
+
+  @IsString()
+  @IsOptional()
+  company: string;
+
+  @IsString()
+  @IsOptional()
+  city: string;
+
+  @IsString()
+  @IsOptional()
+  country: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Position)
+  @IsOptional()
+  positions: Position[];
+
+  @IsEnum(employmentType)
+  @IsOptional()
+  employmentType: employmentType;
+
+  @IsArray()
+  @IsOptional()
   skills: string[];
 }
