@@ -12,5 +12,6 @@ import { Profession, ProfessionSchema } from 'src/schemas';
   ],
   controllers: [ProfessionController],
   providers: [ProfessionService],
+  exports: [ProfessionService],
 })
 export class ProfessionModule {}

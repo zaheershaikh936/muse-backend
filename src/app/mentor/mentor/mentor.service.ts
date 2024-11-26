@@ -83,4 +83,32 @@ export class MentorService {
   getMentorIdByUserId(id: string) {
     return this.mentorModel.findOne({ userId: new ObjectId(id) }, { _id: 1 }).lean().exec();
   }
+
+  getSuggestions(search: string) {
+    const searchRegex = new RegExp(search, 'i');
+    return this.mentorModel.aggregate([
+      {
+        $match: {
+          $or: [
+            { 'user.name': { $regex: searchRegex } },
+            { 'user.profession': { $regex: searchRegex } },
+            { 'location.country': { $regex: searchRegex } },
+            { skills: { $in: [searchRegex] } },
+          ],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          slag: "",
+          name: "$user.name",
+          category: 'mentor',
+        },
+      },
+      {
+        $limit: 15,
+      }
+    ]);
+  }
+
 }

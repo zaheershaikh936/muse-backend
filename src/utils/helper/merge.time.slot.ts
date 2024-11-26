@@ -34,7 +34,6 @@ export function mergeTimeSlots(existing: TimeSlotT[], newSlots: TimeSlotT[]): Ti
 
 export function updateAvailability(obj1: AvailabilityT, obj2: { availability: AvailabilityT }): AvailabilityT {
     const result: AvailabilityT = { ...obj1 };
-
     for (const [day, newSlots] of Object.entries(obj2.availability)) {
         if (result[day]) {
             result[day] = mergeTimeSlots(result[day], newSlots);

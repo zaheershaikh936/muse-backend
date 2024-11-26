@@ -19,4 +19,20 @@ export class RoleService {
   findOne(id: string) {
     return this.roleModel.findById({ _id: id }).lean();
   }
+  getSuggestions(search: string) {
+    return this.roleModel.aggregate([
+      {
+        $match: {
+          name: { $regex: search, $options: 'i' }
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          slag: 1,
+          category: 'role'
+        }
+      }
+    ]);
+  }
 }

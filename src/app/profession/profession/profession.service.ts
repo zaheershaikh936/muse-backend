@@ -149,4 +149,31 @@ export class ProfessionService {
     ]);
     return roles;
   }
+
+  getSuggestions(search: string) {
+    return this.professionModel.aggregate([
+      {
+        $match: {
+          $expr: {
+            $regexMatch: {
+              input: '$name',
+              regex: search,
+              options: 'i',
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          slag: 1,
+          name: 1,
+          category: 'profession',
+        },
+      },
+      {
+        $limit: 10,
+      }
+    ]);
+  }
 }

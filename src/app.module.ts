@@ -11,7 +11,9 @@ import {
   MentorModule,
   AppConfigModule,
   AvailabilityModule,
-  BookingsModule
+  BookingsModule,
+  FileUploadModule,
+  InvoiceModule
 } from './app';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
@@ -28,7 +30,9 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
     MentorModule,
     AppConfigModule,
     AvailabilityModule,
-    BookingsModule
+    BookingsModule,
+    FileUploadModule,
+    InvoiceModule
   ],
   controllers: [AppController],
   providers: [

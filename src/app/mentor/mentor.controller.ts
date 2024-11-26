@@ -27,6 +27,7 @@ import { User } from 'src/utils/decorator/user.decorator';
 import { GetMentorDto } from './dto/mentor.dto';
 import { MentorBookingService } from '../bookings/mentor-booking/bookingsMentor.service';
 import { AuthGuard } from '@nestjs/passport';
+import { ProfessionService } from '../profession/profession/profession.service';
 @Controller('mentor')
 export class MentorController {
   constructor(
@@ -35,6 +36,7 @@ export class MentorController {
     private readonly profileService: ProfileService,
     private readonly roleService: RoleService,
     private readonly bookingService: MentorBookingService,
+    private readonly professionService: ProfessionService,
   ) {}
 
   @UseGuards(AuthGuard('jwt'))
@@ -47,6 +49,14 @@ export class MentorController {
     }
     const mentor = await this.mentorService.getMentorIdByUserId(id);
     return this.bookingService.mentorBookings(mentor._id.toString(), filter)
+  }
+
+  @Get('suggestions')
+  async getSuggestions(@Query('search') search: string) {
+    const mentor = await this.mentorService.getSuggestions(search);
+    const profession = await this.professionService.getSuggestions(search);
+    const role = await this.roleService.getSuggestions(search);
+    return [...profession, ...role, ...mentor];
   }
 
   @UseGuards(JwtAuthGuard)

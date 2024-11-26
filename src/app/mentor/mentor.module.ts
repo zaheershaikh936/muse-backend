@@ -12,6 +12,7 @@ import {
 } from 'src/schemas';
 import { RoleModule } from '../role/role.module';
 import { BookingsModule } from '../bookings/bookings.module';
+import { ProfessionModule } from '../profession/profession.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BookingsModule } from '../bookings/bookings.module';
     ]),
     forwardRef(() => RoleModule),
     forwardRef(() => BookingsModule),
+    forwardRef(() => ProfessionModule),
   ],
   controllers: [MentorController],
   providers: [MentorService, ProfileService, ExperienceService],

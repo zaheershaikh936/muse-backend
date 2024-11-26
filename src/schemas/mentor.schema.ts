@@ -76,14 +76,16 @@ export class Mentor {
       {
         image: { type: String, default: '', required: true },
         company: { type: String, required: true },
-        role: { type: { _id: String, name: String }, required: true },
+        role: { type: String, required: true },
+        experienceId: { type: mongoose.Schema.Types.ObjectId, required: true },
       },
     ],
   })
   experience: {
-    image: string;
-    company: string;
-    role: string;
+      image: string;
+      company: string;
+      role: string;
+      experienceId: string;
   }[];
 
   @Prop({ type: String })
@@ -105,4 +107,9 @@ export class Mentor {
   banned: boolean;
 }
 
+
+
 export const MentorSchema = SchemaFactory.createForClass(Mentor);
+
+MentorSchema.index({ 'user.name': 1, 'profession.name': 1, 'location.country': 1, 'skills': 1 });
+
