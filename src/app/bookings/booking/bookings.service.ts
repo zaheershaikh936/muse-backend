@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Booking } from 'src/schemas';
 import { Model } from 'mongoose';
 import mongoose from 'mongoose';
-import { encryptBookingData } from 'src/utils/helper/booking-encrypt-decrypt'
+import { encryptBookingData, decryptBookingData } from 'src/utils/helper/booking-encrypt-decrypt'
 import { getBookingStatus } from 'src/utils/helper/booking-status-on-time';
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -16,18 +16,28 @@ export class BookingsService {
     return this.bookingModel.create(createBookingDto);
   }
 
-  updateBookingPayment(_id: string) {
+  updateBookingPaymentDetails(_id: string, body: any) {
     return this.bookingModel.updateOne({ _id: new ObjectId(_id) },
       {
-        $set: { isPaid: true, paymentDate: new Date(), updatedAt: new Date(), status: "paid" }
+        $set: { payment: body }
       });
   }
 
-  async updateBookingStatus(_id: string, status: string) {
-    const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(_id) }, { $set: { updatedAt: new Date(), status: status.toLowerCase() } }, { new: true });
-    const uniqueUrl = encryptBookingData(data?._id.toString(), data?.booking?.startTime.toString(), data?.booking?.endTime.toString())
-    await this.bookingModel.updateOne({ _id: new ObjectId(_id) }, { $set: { uniqueUrl } });
-    return data;
+  updateBookingPayment(_id: string) {
+    return this.bookingModel.updateOne({ _id: new ObjectId(_id) }, { $set: { isPaid: true, paymentDate: new Date(), updatedAt: new Date(), status: "paid" } });
+  }
+
+  async updateBookingStatus(paymentUrl: string, body: any) {
+    const decryptData = decryptBookingData(paymentUrl);
+    if (body.status !== 'cancelled') body.uniqueUrl = encryptBookingData(decryptData[0], decryptData[1], decryptData[2]);
+    const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(decryptData[0]) }, { $set: { ...body } }, { new: true });
+    return { mentor: data.mentor, user: data.user, booking: data.booking, status: data.status, uniqueUrl: data?.uniqueUrl, amount: data?.amount };
+  }
+
+
+  findOneByPaymentUrl(paymentUrl: string) {
+    const decryptData = decryptBookingData(paymentUrl);
+    return this.bookingModel.findById({ _id: new ObjectId(decryptData[0]), status: 'paid', isPaid: true }, { mentor: 1, user: 1, booking: 1, status: 1, uniqueUrl: 1, amount: 1 }).lean().exec();
   }
 
   async findOneById(id: string): Promise<any> {

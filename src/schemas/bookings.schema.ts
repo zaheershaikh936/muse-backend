@@ -62,6 +62,24 @@ export class Booking {
     @Prop({ type: String, enum: ['pending', 'paid', 'accepted', 'cancelled', 'completed'], default: 'pending' })
     status: string;
 
+
+    @Prop({
+        type: {
+            cancelReason: { type: String, required: true },
+            email: { type: String, required: true },
+            name: { type: String, required: true },
+            isMentor: { type: Boolean, required: true },
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
+        }, required: false
+    })
+    cancelReason: {
+        cancelReason: string;
+        email: string;
+        name: string;
+        isMentor: boolean;
+        userId: string;
+    };
+
     @Prop({ type: Number, required: true })
     amount: number;
 
@@ -73,6 +91,24 @@ export class Booking {
 
     @Prop({ type: String })
     uniqueUrl: string;
+
+    @Prop({
+        required: false,
+        type: {
+            payment_url: { type: String, required: true },
+            orderId: { type: String, required: true },
+            purchase_units: { amount: { currency_code: { type: String, required: true }, value: { type: String, required: true } } },
+            create_time: { type: Date, required: true },
+            links: [{ href: { type: String, required: true }, rel: { type: String, required: true }, method: { type: String, required: true } }],
+        },
+    })
+    payment: {
+        payment_url: string;
+        orderId: string;
+        purchase_units: { amount: { currency_code: string; value: string } };
+        create_time: Date;
+        links: { href: string; rel: string; method: string }[];
+    };
 
     @Prop({ type: Boolean, default: false })
     isPaid: boolean;

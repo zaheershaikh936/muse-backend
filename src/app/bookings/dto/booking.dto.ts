@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
 
 class CommonUserAndMentorDto {
     @IsString()
@@ -73,9 +73,31 @@ export class CreateBookingDto {
     @IsNotEmpty()
     notes: string;
 
+    payment: {
+        orderId: string;
+        purchase_units: { amount: { currency_code: string; value: string } };
+        create_time: string;
+        links: { href: string; rel: string; method: string }[];
+    }
+    amount: string;
+}
+
+
+
+export class CancelBookingDto {
+    @IsString()
+    @IsOptional()
+    cancelReason: string;
 
     @IsString()
     @IsNotEmpty()
-    amount: string;
+    email: string;
 
+    @IsString()
+    @IsOptional()
+    name: string;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    isMentor: boolean;
 }

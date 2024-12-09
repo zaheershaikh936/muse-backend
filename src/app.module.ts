@@ -13,7 +13,8 @@ import {
   AvailabilityModule,
   BookingsModule,
   FileUploadModule,
-  InvoiceModule
+  InvoiceModule,
+  PaymentModule
 } from './app';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
@@ -32,7 +33,8 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
     AvailabilityModule,
     BookingsModule,
     FileUploadModule,
-    InvoiceModule
+    InvoiceModule,
+    PaymentModule
   ],
   controllers: [AppController],
   providers: [

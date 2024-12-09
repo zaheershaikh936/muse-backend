@@ -1,24 +1,24 @@
-import { Controller, Post, Body, UseGuards, Param, Patch, Get } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Param, Get, Patch } from '@nestjs/common';
 import { BookingsService } from './booking/bookings.service';
-import { CreateBookingDto } from './dto/booking.dto';
+import { CancelBookingDto, CreateBookingDto } from './dto/booking.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/utils/decorator/user.decorator';
 import { UsersService } from '../users/user/users.service';
 import { MentorService } from '../mentor/mentor/mentor.service';
-import { decryptBookingData } from 'src/utils/helper/booking-encrypt-decrypt'
+import { decryptBookingData, encryptBookingData } from 'src/utils/helper/booking-encrypt-decrypt'
+import { PaymentService } from '../payment/payment-order/payment.service';
+import { PaymentCreateOrderResT } from 'src/utils/types';
+
+
 @UseGuards(AuthGuard('jwt'))
 @Controller('booking')
 export class BookingsController {
   constructor(
     private readonly bookingsService: BookingsService,
     private readonly userService: UsersService,
-    private readonly mentorService: MentorService
+    private readonly mentorService: MentorService,
+    private readonly paymentService: PaymentService
   ) { }
-
-  @Patch('/payment/:id')
-  async updatePayment(@Param() id: string) {
-    return this.bookingsService.updateBookingPayment(id);
-  }
 
   @Post()
   async create(@Body() createBookingDto: CreateBookingDto, @User('_id') id: string) {
@@ -35,17 +35,44 @@ export class BookingsController {
       email: mentor.user.email,
       image: mentor.user.image
     }
-    return this.bookingsService.createBooking(createBookingDto);
+    createBookingDto.amount = "20";
+    const booking = await this.bookingsService.createBooking(createBookingDto);
+    const paymentUrl = encryptBookingData(booking?._id.toString(), booking?.booking?.startTime.toString(), booking?.booking?.endTime.toString());
+    const redirectBaseUrl = process.env.PAYPAL_ENV !== 'live' ? process.env.REDIRECT_URL_LOCAL : process.env.REDIRECT_URL_PROD;
+    const body = {
+      price: "20",
+      successUrl: `${redirectBaseUrl}/booking/success/${paymentUrl}`,
+      cancelUrl: `${redirectBaseUrl}/booking/cancel/${paymentUrl}`
+    }
+    const paymentResponse = await this.paymentService.createPayment(body)
+    const payment: PaymentCreateOrderResT = paymentResponse.data;
+    const paymentBody = {
+      payment_url: paymentUrl,
+      orderId: payment.id,
+      purchase_units: {
+        amount: {
+          currency_code: payment.purchase_units[0].amount.currency_code,
+          value: payment.purchase_units[0].amount.value
+        }
+      },
+      create_time: payment.create_time,
+      links: payment.links
+    }
+    await this.bookingsService.updateBookingPaymentDetails(booking._id.toString(), paymentBody)
+    return payment.links[1].href;
   }
 
-  @Patch('/cancel/:id/booking')
-  async CancelBooking(@Param() id: string) {
-    return this.bookingsService.updateBookingStatus(id, "cancelled");
-  }
-
-  @Patch('/conform/:id/booking')
-  async ConformBooking(@Param() id: string) {
-    return this.bookingsService.updateBookingStatus(id, "accepted");
+  @Get('/conform/:id')
+  async ConformBooking(@Param('id') uniqueUrl: string) {
+    const isPaymentCompleted = await this.bookingsService.findOneByPaymentUrl(uniqueUrl)
+    if (isPaymentCompleted.status !== 'pending') return isPaymentCompleted
+    const body = { updatedAt: new Date(), status: 'paid', isPaid: true }
+    const data = await this.bookingsService.updateBookingStatus(uniqueUrl, body);
+    if (data) {
+      const accessToken = await this.paymentService.paypalAuth();
+      await this.paymentService.conformOrder(accessToken, isPaymentCompleted.payment.orderId);
+    }
+    return data;
   }
 
   @Get('/:url')
@@ -54,5 +81,11 @@ export class BookingsController {
     const booking: string[] = data.split('__');
     const id = booking[0];
     return this.bookingsService.findOneById(id)
+  }
+
+  @Patch('/cancel/:id')
+  async CancelBooking(@Param('id') uniqueUrl: string, @Body() cancelBookingDto: CancelBookingDto, @User('_id') id: string) {
+    const body = { updatedAt: new Date(), status: 'cancelled', cancelReason: { ...cancelBookingDto, reason: cancelBookingDto.cancelReason, userId: id, isMentor: cancelBookingDto.isMentor } }
+    return this.bookingsService.updateBookingStatus(uniqueUrl, body)
   }
 }

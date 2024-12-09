@@ -22,9 +22,9 @@ const decryptBookingData = (encrypted: string) => {
     try {
         const [ivHex, encryptedData] = encrypted.split(':');
         const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(ivHex, 'hex'));
-        return (
-            decipher.update(encryptedData, 'hex', 'utf8') + decipher.final('utf8')
-        );
+        const data = decipher.update(encryptedData, 'hex', 'utf8') + decipher.final('utf8');
+        const booking: string[] = data.split('__');
+        return booking;
     } catch (error) {
         console.error(error);
         return error;
