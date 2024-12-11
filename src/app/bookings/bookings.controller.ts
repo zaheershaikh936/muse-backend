@@ -70,22 +70,29 @@ export class BookingsController {
     const data = await this.bookingsService.updateBookingStatus(uniqueUrl, body);
     if (data) {
       const accessToken = await this.paymentService.paypalAuth();
-      await this.paymentService.conformOrder(accessToken, isPaymentCompleted.payment.orderId);
+      const conformPayment = await this.paymentService.conformOrder(accessToken, data?.paymentId);
+      delete data?.paymentId;
+      const refundId = conformPayment.purchase_units[0].payments.captures[0].id
+      await this.bookingsService.updateBookingStatus(uniqueUrl, { 'payment.refundId': refundId });
     }
-    return data;
+    return "conformPayment";
   }
 
   @Get('/:url')
   async findBooking(@Param('url') url: string) {
     const data = decryptBookingData(url);
-    const booking: string[] = data.split('__');
-    const id = booking[0];
+    const id = data[0];
     return this.bookingsService.findOneById(id)
   }
 
   @Patch('/cancel/:id')
   async CancelBooking(@Param('id') uniqueUrl: string, @Body() cancelBookingDto: CancelBookingDto, @User('_id') id: string) {
-    const body = { updatedAt: new Date(), status: 'cancelled', cancelReason: { ...cancelBookingDto, reason: cancelBookingDto.cancelReason, userId: id, isMentor: cancelBookingDto.isMentor } }
-    return this.bookingsService.updateBookingStatus(uniqueUrl, body)
+    const isPaymentPaid = await this.bookingsService.findOneByPaymentUrl(uniqueUrl)
+    if (isPaymentPaid.status !== 'paid') return "You can't cancel this booking.";
+    const body = { updatedAt: new Date(), status: 'cancelled', cancelReason: { ...cancelBookingDto, reason: cancelBookingDto.cancelReason, userId: id, isMentor: cancelBookingDto.isMentor } };
+    const data = await this.bookingsService.updateBookingStatus(uniqueUrl, body);
+    const refund = await this.paymentService.refundOrderPaymentPaypal(data.refundId);
+    await this.bookingsService.updateBookingStatus(uniqueUrl, { refundDetails: refund });
+    return data; 
   }
 }

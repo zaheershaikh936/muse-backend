@@ -96,14 +96,33 @@ export class PaymentService {
           'Prefer': 'return=representation',
           'Authorization': `Bearer ${accessToken}`,
         },
-        data: ""
       };
-
       const response = await axios.request(config);
       return response.data
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
     }
   }
+
+  async refundOrderPaymentPaypal(id: string) {
+    try {
+      const accessToken = await this.paypalAuth();
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${this.baseUrl}/v2/payments/captures/${id}/refund`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      };
+      const response = await axios.request(config);
+      return response.data;
+    } catch (error) {
+      console.error('Error:', error.response?.data || error.message);
+    }
+  }
+
 }
 

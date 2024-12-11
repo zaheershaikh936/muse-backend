@@ -62,6 +62,48 @@ export class Booking {
     @Prop({ type: String, enum: ['pending', 'paid', 'accepted', 'cancelled', 'completed'], default: 'pending' })
     status: string;
 
+    @Prop({
+        type: {
+            id: { type: String, required: true },
+            amount: { type: { currency_code: { type: String, required: true }, value: { type: String, required: true } }, required: true },
+            seller_payable_breakdown: {
+                gross_amount: { type: { currency_code: { type: String, required: true }, value: { type: String, required: true } }, required: true },
+                paypal_fee: { type: { currency_code: { type: String, required: true }, value: { type: String, required: true } }, required: true },
+                net_amount: { type: { currency_code: { type: String, required: true }, value: { type: String, required: true } }, required: true },
+            },
+            status: { type: String, required: true },
+            create_time: { type: String, required: true },
+            update_time: { type: String, required: true },
+            links: [{ href: { type: String, required: true }, rel: { type: String, required: true }, method: { type: String, required: true } }],
+        },
+        required: false,
+    })
+    refundDetails: {
+        id: string;
+        amount: {
+            currency_code: string;
+            value: string;
+        };
+        seller_payable_breakdown: {
+            gross_amount: {
+                currency_code: string;
+                value: string;
+            };
+            paypal_fee: {
+                currency_code: string;
+                value: string;
+            };
+            net_amount: {
+                currency_code: string;
+                value: string;
+            };
+        };
+        status: string;
+        create_time: string;
+        update_time: string;
+        links: [{ href: string; rel: string; method: string }];
+    };
+
 
     @Prop({
         type: {
@@ -97,6 +139,7 @@ export class Booking {
         type: {
             payment_url: { type: String, required: true },
             orderId: { type: String, required: true },
+            refundId: { type: String, required: false },
             purchase_units: { amount: { currency_code: { type: String, required: true }, value: { type: String, required: true } } },
             create_time: { type: Date, required: true },
             links: [{ href: { type: String, required: true }, rel: { type: String, required: true }, method: { type: String, required: true } }],
@@ -105,6 +148,7 @@ export class Booking {
     payment: {
         payment_url: string;
         orderId: string;
+            refundId: string;
         purchase_units: { amount: { currency_code: string; value: string } };
         create_time: Date;
         links: { href: string; rel: string; method: string }[];

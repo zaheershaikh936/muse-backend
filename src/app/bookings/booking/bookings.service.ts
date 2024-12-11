@@ -31,7 +31,7 @@ export class BookingsService {
     const decryptData = decryptBookingData(paymentUrl);
     if (body.status !== 'cancelled') body.uniqueUrl = encryptBookingData(decryptData[0], decryptData[1], decryptData[2]);
     const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(decryptData[0]) }, { $set: { ...body } }, { new: true });
-    return { mentor: data.mentor, user: data.user, booking: data.booking, status: data.status, uniqueUrl: data?.uniqueUrl, amount: data?.amount };
+    return { mentor: data.mentor, user: data.user, booking: data.booking, status: data.status, uniqueUrl: data?.uniqueUrl, amount: data?.amount, paymentId: data?.payment?.orderId, refundId: data?.payment?.refundId };
   }
 
 

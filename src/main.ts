@@ -27,6 +27,10 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.setGlobalPrefix('api/v1/');
+
   app.enableCors({
     origin: corsOptions.origin,
     credentials: true,
@@ -46,9 +50,7 @@ async function bootstrap() {
       overwrite: true,
     }),
   );
-  app.useGlobalFilters(new GlobalExceptionFilter());
-  app.useGlobalInterceptors(new ResponseInterceptor());
-  app.setGlobalPrefix('api/v1/');
+
   //! /* SECURITY */
   app.use(
     helmet({
@@ -57,13 +59,13 @@ async function bootstrap() {
   );
 
   //? Rate Limit Middleware
-  // app.use(
-  //   rateLimit({
-  //     windowMs: 15 * 60 * 1000, // 15 minutes
-  //     max: 200, // limit each IP to 100 requests per windowMs
-  //     message: 'Too many requests from this IP, please try again later',
-  //   }),
-  // );
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 200, // limit each IP to 100 requests per windowMs
+      message: 'Too many requests from this IP, please try again later',
+    }),
+  );
   const createAccountLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 3, // start blocking after 3 requests
