@@ -1,30 +1,33 @@
-import * as crypto from 'crypto';
+import * as CryptoJS from 'crypto-js';
 import { Logger } from '@nestjs/common';
 
-const algorithm = 'aes-256-cbc';
-const key = crypto.scryptSync(process.env.BOOKING_SECRET_KEY, 'salt', 32); // Ensures key is 32 bytes
-const iv = crypto.randomBytes(16); // 16 bytes for aes-256-cbc
+// Helper function to make Base64 URL-safe
+function toBase64UrlSafe(base64) {
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
-const encryptBookingData = (id: string, startTime: string, endTime: string) => {
+// Helper function to decode Base64 URL-safe back to standard Base64
+function fromBase64UrlSafe(base64UrlSafe) {
+    return base64UrlSafe.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - base64UrlSafe.length % 4) % 4);
+}
+
+const encryptBookingData = async (id: string, startTime: string, endTime: string) => {
     try {
-        const cipher = crypto.createCipheriv(algorithm, key, iv);
-        const encrypted =
-            cipher.update(`${id}__${startTime}__${endTime}`, 'utf8', 'hex') +
-            cipher.final('hex');
-        return `${iv.toString('hex')}:${encrypted}`; // Store IV with the encrypted data
+        const data = `${id},${startTime},${endTime}`;
+        const ciphertext = CryptoJS.AES.encrypt(data, process.env.BOOKING_SECRET_KEY).toString();
+        return toBase64UrlSafe(ciphertext); // Convert to URL-safe Base64
     } catch (error) {
         Logger.error(error);
         return error;
     }
 };
 
-const decryptBookingData = (encrypted: string) => {
+const decryptBookingData = (encrypted: string): string[] => {
     try {
-        const [ivHex, encryptedData] = encrypted.split(':');
-        const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(ivHex, 'hex'));
-        const data = decipher.update(encryptedData, 'hex', 'utf8') + decipher.final('utf8');
-        const booking: string[] = data.split('__');
-        return booking;
+        const standardBase64 = fromBase64UrlSafe(encrypted);
+        const bytes = CryptoJS.AES.decrypt(standardBase64, process.env.BOOKING_SECRET_KEY);
+        const originalData = bytes.toString(CryptoJS.enc.Utf8);
+        return originalData.split(',');
     } catch (error) {
         console.error(error);
         return error;

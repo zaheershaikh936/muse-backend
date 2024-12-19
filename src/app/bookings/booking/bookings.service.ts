@@ -28,15 +28,22 @@ export class BookingsService {
   }
 
   async updateBookingStatus(paymentUrl: string, body: any) {
-    const decryptData = decryptBookingData(paymentUrl);
-    if (body.status !== 'cancelled') body.uniqueUrl = encryptBookingData(decryptData[0], decryptData[1], decryptData[2]);
+    console.log(body);
+    console.log(1);
+    const decryptData: string[] = decryptBookingData(paymentUrl);
+    console.log(2);
+    if (body.status !== 'cancelled') body.uniqueUrl = await encryptBookingData(decryptData[0], decryptData[1], decryptData[2]);
+    console.log(3);
+    console.log(decryptData[0]);
+    console.log({ ...body });
     const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(decryptData[0]) }, { $set: { ...body } }, { new: true });
+    console.log(4);
     return { mentor: data.mentor, user: data.user, booking: data.booking, status: data.status, uniqueUrl: data?.uniqueUrl, amount: data?.amount, paymentId: data?.payment?.orderId, refundId: data?.payment?.refundId };
   }
 
 
-  findOneByPaymentUrl(paymentUrl: string) {
-    const decryptData = decryptBookingData(paymentUrl);
+  async findOneByPaymentUrl(paymentUrl: string) {
+    const decryptData: string[] = await decryptBookingData(paymentUrl);
     return this.bookingModel.findById({ _id: new ObjectId(decryptData[0]), status: 'paid', isPaid: true }, { mentor: 1, user: 1, booking: 1, status: 1, uniqueUrl: 1, amount: 1 }).lean().exec();
   }
 

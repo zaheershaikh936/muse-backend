@@ -6,9 +6,10 @@ export class PaymentService {
   private baseUrl = process.env.PAYPAL_ENV === 'live' ? process.env.PAYPAL_CLIENT_URL : process.env.PAYPAL_SANDBOX_CLIENT_URL;
 
   async createPayment(body: { price: string, successUrl: string, cancelUrl: string }) {
+    console.log(1.1);
     const accessToken = await this.paypalAuth();
-    const createOrder = await this.createOrder(accessToken, body);
-    return createOrder
+
+    return await this.createOrder(accessToken, body);
   }
 
   async paypalAuth() {
@@ -49,13 +50,14 @@ export class PaymentService {
   };
 
   async createOrder(accessToken: string, body: { price: string, successUrl: string, cancelUrl: string }) {
+    console.log(2.1);
     const data = JSON.stringify({
       "intent": "CAPTURE",
       "purchase_units": [
         {
           "amount": {
             "currency_code": "USD",
-            "value": body.price
+            "value": body.price.toString()
           }
         }
       ],
@@ -65,8 +67,10 @@ export class PaymentService {
         "user_action": "PAY_NOW"
       }
     });
+    console.log(2.2);
 
     try {
+      console.log(2.3);
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
@@ -78,10 +82,15 @@ export class PaymentService {
         },
         data: data
       };
-
-      return await axios.request(config);
+      console.log(2.4);
+      const response = await axios.request(config);
+      console.log(2.5);
+      console.log(response.data);
+      console.log(2.6);
+      return response
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
+      console.log(2.7);
     }
   }
 

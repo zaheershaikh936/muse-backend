@@ -103,7 +103,8 @@ export class MentorBookingService {
                     userId: 1,
                     mentorId: 1,
                     booking: 1,
-                    status: 1
+                    status: 1,
+                    uniqueUrl: 1
                 }
             },
             { $sort: { createdAt: -1 } }

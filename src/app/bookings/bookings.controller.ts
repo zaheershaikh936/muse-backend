@@ -37,7 +37,7 @@ export class BookingsController {
     }
     createBookingDto.amount = "20";
     const booking = await this.bookingsService.createBooking(createBookingDto);
-    const paymentUrl = encryptBookingData(booking?._id.toString(), booking?.booking?.startTime.toString(), booking?.booking?.endTime.toString());
+    const paymentUrl = await encryptBookingData(booking?._id.toString(), booking?.booking?.startTime.toString(), booking?.booking?.endTime.toString());
     const redirectBaseUrl = process.env.PAYPAL_ENV !== 'live' ? process.env.REDIRECT_URL_LOCAL : process.env.REDIRECT_URL_PROD;
     const body = {
       price: "20",
@@ -73,9 +73,17 @@ export class BookingsController {
       const conformPayment = await this.paymentService.conformOrder(accessToken, data?.paymentId);
       delete data?.paymentId;
       const refundId = conformPayment.purchase_units[0].payments.captures[0].id
-      await this.bookingsService.updateBookingStatus(uniqueUrl, { 'payment.refundId': refundId });
+      return await this.bookingsService.updateBookingStatus(uniqueUrl, { 'payment.refundId': refundId });
     }
     return "conformPayment";
+  }
+
+  @Get('/accept/:id')
+  async AcceptBooking(@Param('id') uniqueUrl: string) {
+    const isPaymentCompleted = await this.bookingsService.findOneByPaymentUrl(uniqueUrl)
+    if (isPaymentCompleted.status !== 'paid') return isPaymentCompleted
+    const body = { updatedAt: new Date(), status: 'accepted', isPaid: true }
+    return await this.bookingsService.updateBookingStatus(uniqueUrl, body);
   }
 
   @Get('/:url')
