@@ -12,11 +12,13 @@ import { CreateAvailabilityDto, UpdateAvailabilityDto } from './dto/create-avail
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/utils/decorator/user.decorator';
 import { MentorService } from '../mentor/mentor/mentor.service';
+import { BookingsService } from '../bookings/booking/bookings.service';
 
 @Controller('availability')
 export class AvailabilityController {
   constructor(
     private readonly availabilityService: AvailabilityService,
+    private readonly bookingService: BookingsService,
     private readonly mentorService: MentorService) { }
 
   @UseGuards(AuthGuard('jwt'))
@@ -47,11 +49,11 @@ export class AvailabilityController {
   async getAvailabilityTimeSlot(@Param("id") id: string, @Param('day') day: string) {
     const data = await this.availabilityService.findOne(id, day);
     const availability = [];
-    for (const item of data.availability[day]) {
-      if (item.status) availability.push(item);
-    }
-    const bookings = [];
+    for (const item of data.availability[day]) if (item.status) availability.push(item);
+    const bookings = await this.bookingService.findAllByMentorId(id, day)
+    console.log(bookings);
     const availableSlots = this.availabilityService.getAvailableSlots(availability, bookings);
+    console.log(6);
     return availableSlots;
   }
 

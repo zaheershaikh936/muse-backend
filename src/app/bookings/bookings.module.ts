@@ -12,10 +12,9 @@ import { MentorModule, PaymentModule, UsersModule, } from '../index';
     forwardRef(() => UsersModule),
     forwardRef(() => MentorModule),
     forwardRef(() => PaymentModule),
-
   ],
   controllers: [BookingsController],
   providers: [BookingsService, MentorBookingService],
-  exports: [MentorBookingService]
+  exports: [MentorBookingService, BookingsService]
 })
 export class BookingsModule { }

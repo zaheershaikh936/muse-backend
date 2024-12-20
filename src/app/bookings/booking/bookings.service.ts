@@ -28,16 +28,9 @@ export class BookingsService {
   }
 
   async updateBookingStatus(paymentUrl: string, body: any) {
-    console.log(body);
-    console.log(1);
     const decryptData: string[] = decryptBookingData(paymentUrl);
-    console.log(2);
     if (body.status !== 'cancelled') body.uniqueUrl = await encryptBookingData(decryptData[0], decryptData[1], decryptData[2]);
-    console.log(3);
-    console.log(decryptData[0]);
-    console.log({ ...body });
     const data = await this.bookingModel.findByIdAndUpdate({ _id: new ObjectId(decryptData[0]) }, { $set: { ...body } }, { new: true });
-    console.log(4);
     return { mentor: data.mentor, user: data.user, booking: data.booking, status: data.status, uniqueUrl: data?.uniqueUrl, amount: data?.amount, paymentId: data?.payment?.orderId, refundId: data?.payment?.refundId };
   }
 
@@ -56,5 +49,18 @@ export class BookingsService {
       ...data,
       bookingStatus: result
     }
+  }
+
+  findAllByMentorId(id: string, day: string) {
+    const dayInString = day.charAt(0).toUpperCase() + day.slice(1);
+    return this.bookingModel.aggregate([
+      {
+        $match: {
+          mentorId: new ObjectId(id),
+          status: { $nin: ['cancelled'] },
+          'booking.day': dayInString
+        }
+      }
+    ]);
   }
 }

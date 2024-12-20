@@ -141,7 +141,8 @@ export class MentorBookingService {
                         }
                     },
                     paymentId: '$payment.payment_url',
-                    refundDetails: 1
+                    refundDetails: 1,
+                    cancelReason: 1
                 }
             },
             { $sort: { createdAt: -1 } }
