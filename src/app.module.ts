@@ -2,7 +2,21 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { LoggerMiddleware } from './utils/common/http.logger/http.logger';
 import { GlobalExceptionFilter } from './utils/common/interceptor';
 import { ConfigModule } from '@nestjs/config';
-import { AppController, AppService, AuthModule, ProfessionModule, RoleModule } from './app';
+import {
+  AppController,
+  AppService,
+  AuthModule,
+  ProfessionModule,
+  RoleModule,
+  MentorModule,
+  AppConfigModule,
+  AvailabilityModule,
+  BookingsModule,
+  FileUploadModule,
+  InvoiceModule,
+  PaymentModule,
+  ReviewsModule
+} from './app';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 @Module({
@@ -15,9 +29,20 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
     AuthModule,
     ProfessionModule,
     RoleModule,
+    MentorModule,
+    AppConfigModule,
+    AvailabilityModule,
+    BookingsModule,
+    FileUploadModule,
+    InvoiceModule,
+    PaymentModule,
+    ReviewsModule
   ],
   controllers: [AppController],
-  providers: [AppService, { provide: GlobalExceptionFilter, useClass: SentryGlobalFilter }],
+  providers: [
+    AppService,
+    { provide: GlobalExceptionFilter, useClass: SentryGlobalFilter },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

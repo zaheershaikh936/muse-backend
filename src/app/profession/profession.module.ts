@@ -5,8 +5,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Profession, ProfessionSchema } from 'src/schemas';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Profession.name, schema: ProfessionSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Profession.name, schema: ProfessionSchema },
+    ]),
+  ],
   controllers: [ProfessionController],
   providers: [ProfessionService],
+  exports: [ProfessionService],
 })
-export class ProfessionModule { }
+export class ProfessionModule {}
