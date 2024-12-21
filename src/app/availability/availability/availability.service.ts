@@ -36,6 +36,10 @@ export class AvailabilityService {
     return this.availabilityModel.findOneAndUpdate({ userId: new ObjectId(id) }, { availability: body.availability }, { new: true }).lean().exec();
   }
 
+  findMentorAvailability(id: string) {
+    return this.availabilityModel.findOne({ userId: new ObjectId(id) }, { availability: 1 }).lean().exec();
+  }
+
   getAvailableSlots(availability: any[], bookings: any[]) {
     const currentDate = new Date();
     const slots = [];
@@ -84,8 +88,6 @@ export class AvailabilityService {
     return slots;
   }
 
-
-  findMentorAvailability(id: string) {
-    return this.availabilityModel.findOne({ userId: new ObjectId(id) }, { availability: 1 }).lean().exec();
-  }
 }
+
+

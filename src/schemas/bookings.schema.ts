@@ -11,12 +11,14 @@ export class Booking {
             name: { type: String, required: true },
             email: { type: String, required: true },
             image: { type: String, required: false },
+            isUserJoin: { type: Boolean, required: false, default: false },
         },
     })
     user: {
         name: string;
         email: string;
         image: string;
+            isUserJoin: boolean
     };
 
     @Prop({
@@ -25,16 +27,21 @@ export class Booking {
             name: { type: String, required: true },
             email: { type: String, required: true },
             image: { type: String, required: false },
+            isUserJoin: { type: Boolean, required: false, default: false },
         },
     })
     mentor: {
         name: string;
         email: string;
         image: string;
+            isUserJoin: boolean
     };
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true })
     userId: string;
+
+    @Prop({ type: String, required: false })
+    roomId: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'mentors', required: true })
     mentorId: string;

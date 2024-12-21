@@ -63,4 +63,8 @@ export class BookingsService {
       }
     ]);
   }
+
+  async findBookingById(_id: string) {
+    return this.bookingModel.findById({ _id }, { "booking.endTime": 1, _id: 0 }).lean().exec();
+  }
 }

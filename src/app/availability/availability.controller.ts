@@ -51,7 +51,6 @@ export class AvailabilityController {
     const availability = [];
     for (const item of data.availability[day]) if (item.status) availability.push(item);
     const bookings = await this.bookingService.findAllByMentorId(id, day)
-    console.log(bookings);
     const availableSlots = this.availabilityService.getAvailableSlots(availability, bookings);
     console.log(6);
     return availableSlots;

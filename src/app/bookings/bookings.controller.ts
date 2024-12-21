@@ -8,6 +8,8 @@ import { MentorService } from '../mentor/mentor/mentor.service';
 import { decryptBookingData, encryptBookingData } from 'src/utils/helper/booking-encrypt-decrypt'
 import { PaymentService } from '../payment/payment-order/payment.service';
 import { PaymentCreateOrderResT } from 'src/utils/types';
+import { generateRoomId } from 'src/utils/helper/generate-booking-room-id';
+import { isBookingCompleted } from 'src/utils/helper/booking-status-on-time';
 
 
 @UseGuards(AuthGuard('jwt'))
@@ -82,7 +84,8 @@ export class BookingsController {
   async AcceptBooking(@Param('id') uniqueUrl: string) {
     const isPaymentCompleted = await this.bookingsService.findOneByPaymentUrl(uniqueUrl)
     if (isPaymentCompleted.status !== 'paid') return isPaymentCompleted
-    const body = { updatedAt: new Date(), status: 'accepted', isPaid: true }
+    const roomId = generateRoomId();
+    const body = { updatedAt: new Date(), status: 'accepted', isPaid: true, roomId }
     return await this.bookingsService.updateBookingStatus(uniqueUrl, body);
   }
 
@@ -102,5 +105,28 @@ export class BookingsController {
     const refund = await this.paymentService.refundOrderPaymentPaypal(data.refundId);
     await this.bookingsService.updateBookingStatus(uniqueUrl, { refundDetails: refund });
     return data; 
+  }
+
+
+  @Patch('join/:url')
+  async updateUserStatus(@Param('url') url: string) {
+    const body = { 'user.isUserJoin': true, 'mentor.isUserJoin': true }
+    return await this.bookingsService.updateBookingStatus(url, body);
+  }
+
+  @Patch('/complete/:url')
+  async CompleteBooking(@Param('url') url: string) {
+    const uniqueUrl = decryptBookingData(url);
+    const { booking } = await this.bookingsService.findBookingById(uniqueUrl[0]);
+    const { endTime } = booking
+    const body = { status: "completed" }
+    await this.bookingsService.updateBookingStatus(url, body);
+    const isBookingCompletedStatus = isBookingCompleted(endTime.toString())
+    if (isBookingCompletedStatus) {
+      const body = { status: "completed" }
+      await this.bookingsService.updateBookingStatus(url, body);
+      return isBookingCompletedStatus
+    }
+    return isBookingCompletedStatus
   }
 }

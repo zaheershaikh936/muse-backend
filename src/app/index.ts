@@ -12,6 +12,8 @@ import { BookingsModule } from './bookings/bookings.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { PaymentModule } from './payment/payment.module';
+import { ReviewsModule } from './reviews/reviews.module';
+
 
 
 export {
@@ -28,5 +30,6 @@ export {
   BookingsModule,
   FileUploadModule,
   InvoiceModule,
-  PaymentModule
+  PaymentModule,
+  ReviewsModule
 };

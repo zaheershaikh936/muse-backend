@@ -20,6 +20,8 @@ import {
 } from './availability.schema';
 
 import { Booking, BookingDocument, BookingSchema } from './bookings.schema';
+import { Review, ReviewDocument, ReviewSchema } from './reviews.schema';
+
 
 export {
   employmentType,
@@ -46,5 +48,8 @@ export {
   AvailabilitySchema,
   Booking,
   BookingDocument,
-  BookingSchema
+  BookingSchema,
+  Review,
+  ReviewDocument,
+  ReviewSchema
 };
