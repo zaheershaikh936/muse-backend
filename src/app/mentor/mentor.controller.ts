@@ -184,7 +184,8 @@ export class MentorController {
     return this.mentorService.featuredMentors();
   }
 
-  @Post('/mentor/get-all')
+  // mentor/get-all
+  @Post('/get-all')
   async getAllMentor(@Body() body: GetMentorDto) {
     return this.mentorService.getAll(body);
   }

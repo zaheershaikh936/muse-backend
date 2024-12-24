@@ -17,6 +17,7 @@ export class MentorService {
       },
       {
         $project: {
+          _id: '$user.userId',
           image: '$user.image',
           tag: 'Top Mentor',
           name: '$user.name',
@@ -65,7 +66,7 @@ export class MentorService {
     const [data = {}] = await this.mentorModel.aggregate([
       {
         $match: {
-          _id: new ObjectId(id),
+          'user.userId': id,
         },
       },
     ]);
@@ -99,7 +100,7 @@ export class MentorService {
       },
       {
         $project: {
-          _id: 1,
+          _id: "$user.userId",
           slag: "",
           name: "$user.name",
           category: 'mentor',

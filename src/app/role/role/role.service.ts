@@ -28,6 +28,7 @@ export class RoleService {
       },
       {
         $project: {
+          professionSlug: '$profession.slug', 
           name: 1,
           slag: 1,
           category: 'role'

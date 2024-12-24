@@ -15,3 +15,8 @@ total earning
 
 
 payment gateway 
+
+
+
+!Code updates
+-> store usedId in user object for seo to fetch with name and it should be uinique
