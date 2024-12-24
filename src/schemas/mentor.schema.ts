@@ -14,12 +14,14 @@ export class Mentor {
   @Prop({
     required: false,
     type: {
+      userId: { type: String, required: true },
       name: { type: String, required: true },
       email: { type: String, required: true },
       image: { type: String, required: false },
     },
   })
   user: {
+      userId: string;
     name: string;
     email: string;
     image: string;
