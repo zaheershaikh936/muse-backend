@@ -8,8 +8,7 @@ export class LoginService {
   constructor(
     private readonly userService: UsersService,
     private readonly registerService: RegisterService,
-  ) {}
-
+  ) { }
   async login(loginDto: LoginDTO) {
     const isExist = await this.userService.isExist(loginDto.email);
     if (!isExist)
