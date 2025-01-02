@@ -10,6 +10,7 @@ import { PaymentService } from '../payment/payment-order/payment.service';
 import { PaymentCreateOrderResT } from 'src/utils/types';
 import { generateRoomId } from 'src/utils/helper/generate-booking-room-id';
 import { isBookingCompleted } from 'src/utils/helper/booking-status-on-time';
+import { newBooking, userCancelBooking } from 'src/utils/email-template';
 
 
 @UseGuards(AuthGuard('jwt'))
@@ -75,6 +76,27 @@ export class BookingsController {
       const conformPayment = await this.paymentService.conformOrder(accessToken, data?.paymentId);
       delete data?.paymentId;
       const refundId = conformPayment.purchase_units[0].payments.captures[0].id
+      const bookingDate = new Date(isPaymentCompleted?.booking.bookingDate);
+      const day = bookingDate.getDate();
+      const year = bookingDate.getFullYear();
+      const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(bookingDate);
+      const message = {
+        mentorName: isPaymentCompleted.mentor.name,
+        booking: {
+          day: isPaymentCompleted?.booking.day,
+          month: month,
+          date: `${day}, ${year}`,
+          startTimeString: isPaymentCompleted?.booking?.startTimeString,
+          endTimeString: isPaymentCompleted?.booking?.endTimeString
+        },
+        user: {
+          name: isPaymentCompleted?.user.name,
+          email: isPaymentCompleted?.user?.email
+        },
+        notes: isPaymentCompleted?.notes,
+        web_url: process.env.WEB_URL
+      }
+      await newBooking(isPaymentCompleted.mentor.email, message);
       return await this.bookingsService.updateBookingStatus(uniqueUrl, { 'payment.refundId': refundId });
     }
     return "conformPayment";
@@ -104,6 +126,28 @@ export class BookingsController {
     const data = await this.bookingsService.updateBookingStatus(uniqueUrl, body);
     const refund = await this.paymentService.refundOrderPaymentPaypal(data.refundId);
     await this.bookingsService.updateBookingStatus(uniqueUrl, { refundDetails: refund });
+    if (!cancelBookingDto.isMentor) {
+      const bookingDate = new Date(data?.booking?.bookingDate);
+      const day = bookingDate.getDate();
+      const year = bookingDate.getFullYear();
+      const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(bookingDate);
+      const mentor = {
+        mentorName: data.mentor.name,
+        user: {
+          name: data?.user?.name,
+          email: data?.user?.email
+        },
+        booking: {
+          day: data?.booking?.day,
+          month: month,
+          bookingDate: `${day}, ${year}`,
+          startTimeString: data?.booking?.startTimeString,
+          endTimeString: data?.booking?.endTimeString
+        },
+        web_url: process.env.WEB_URL
+      }
+      await userCancelBooking(data?.mentor?.email, mentor)
+    }
     return data; 
   }
 

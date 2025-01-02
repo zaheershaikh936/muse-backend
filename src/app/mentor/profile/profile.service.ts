@@ -17,7 +17,7 @@ export class ProfileService {
   isExist(userId: string) {
     return this.mentorModel.countDocuments({ userId }).lean();
   }
-  async create(createMentorDto: any) {
+  async create(createMentorDto: unknown) {
     const mentor = new this.mentorModel(createMentorDto);
     return await mentor.save();
   }

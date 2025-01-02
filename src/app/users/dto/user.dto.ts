@@ -5,6 +5,11 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
+
+  @IsString()
+  @IsOptional()
+  email: string;
+
   @IsString()
   @IsOptional()
   name: string;

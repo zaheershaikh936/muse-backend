@@ -1,4 +1,4 @@
-import { Controller, Body, UseGuards, Patch, Param, Get, Query, Delete } from '@nestjs/common';
+import { Controller, Body, UseGuards, Patch, Param, Get, Query, Delete, Logger } from '@nestjs/common';
 import { UsersService } from './user/users.service';
 import { UpdateUserDto } from './dto/user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/utils/guard/jwt-user.guards';
 import { ProfileService } from '../mentor/profile/profile.service';
 import { User } from 'src/utils/decorator/user.decorator';
 import { MentorBookingService } from '../bookings/mentor-booking/bookingsMentor.service';
+import { slugHelper } from 'src/utils/helper/slug-helper';
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
@@ -21,9 +22,11 @@ export class UsersController {
     try {
       updateUserDto.updatedAt = new Date();
       if (updateUserDto.isMentor) {
-        const mentor = await this.profileService.create({ userId: id });
-        console.log(mentor);
+        const userId = slugHelper(updateUserDto.name)
+        Logger.debug({ name: updateUserDto.name, image: updateUserDto.image, userId: userId, email: updateUserDto.email })
+        await this.profileService.create({ userId: id, user: { name: updateUserDto.name, image: updateUserDto.image, userId: userId, email: updateUserDto.email } });
       }
+      delete updateUserDto.email;
       return this.usersService.update(id, updateUserDto);
     } catch (error) {
       console.log(error);

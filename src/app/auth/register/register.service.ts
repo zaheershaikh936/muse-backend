@@ -2,6 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO } from '../dto';
 import { UsersService } from 'src/app/users/user/users.service';
+import { welcomeEmail } from 'src/utils/email-template';
+
 @Injectable()
 export class RegisterService {
   constructor(
@@ -23,6 +25,7 @@ export class RegisterService {
       _id: String(user._id),
       role: user.role,
     });
+    await welcomeEmail(registerDTO.email.toLowerCase(), { name: registerDTO.name, website_url: process.env.WEB_URL })
     return {
       user: { name: user.name, email: user.email, role: user.role },
       token: { accessToken, refreshToken },

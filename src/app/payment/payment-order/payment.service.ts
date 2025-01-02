@@ -50,7 +50,6 @@ export class PaymentService {
   };
 
   async createOrder(accessToken: string, body: { price: string, successUrl: string, cancelUrl: string }) {
-    console.log(2.1);
     const data = JSON.stringify({
       "intent": "CAPTURE",
       "purchase_units": [
@@ -67,10 +66,8 @@ export class PaymentService {
         "user_action": "PAY_NOW"
       }
     });
-    console.log(2.2);
 
     try {
-      console.log(2.3);
       const config = {
         method: 'post',
         maxBodyLength: Infinity,
@@ -82,15 +79,10 @@ export class PaymentService {
         },
         data: data
       };
-      console.log(2.4);
       const response = await axios.request(config);
-      console.log(2.5);
-      console.log(response.data);
-      console.log(2.6);
       return response
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
-      console.log(2.7);
     }
   }
 

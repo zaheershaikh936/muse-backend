@@ -30,6 +30,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@paypal/paypal-server-sdk": "^0.6.1",
+    "@sendgrid/mail": "8.1.4",
     "@sentry/nestjs": "^8.30.0",
     "@sentry/profiling-node": "^8.30.0",
     "aws-sdk": "^2.1692.0",
