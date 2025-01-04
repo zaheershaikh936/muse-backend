@@ -85,9 +85,10 @@ export class MentorBookingService {
         if (filter?.status?.length) {
             pipeline.push({ $match: { status: { $in: filter.status } } })
         }
-        const [{ total = 0 }] = await this.bookingModel.aggregate([{ $match: { mentorId: new ObjectId(id), isPaid: true, } }, ...pipeline, { $count: "total" }])
+        const [{ total = 0 }] = await this.bookingModel.aggregate([{ $match: { mentorId: new ObjectId(id), isPaid: true, } }, ...pipeline, { $count: "total" }]);
         pipeline.push({ $skip: (filter.page - 1) * filter.limit })
-        pipeline.push()
+        pipeline.push({ $limit: filter.limit })
+
         const data = await this.bookingModel.aggregate([
             {
                 $match: {
@@ -104,7 +105,9 @@ export class MentorBookingService {
                     mentorId: 1,
                     booking: 1,
                     status: 1,
-                    uniqueUrl: 1
+                    uniqueUrl: 1,
+                    refundDetails: 1,
+                    cancelReason: 1,
                 }
             },
             { $sort: { createdAt: -1 } }
@@ -114,12 +117,10 @@ export class MentorBookingService {
 
     async getUserBookings(id: string, filter: MentorFilterType) {
         const pipeline = [];
-        if (filter?.status?.length) {
-            pipeline.push({ $match: { status: { $in: filter.status } } })
-        }
+        if (filter?.status?.length) pipeline.push({ $match: { status: { $in: filter.status } } })
         const [{ total = 0 }] = await this.bookingModel.aggregate([{ $match: { userId: new ObjectId(id) } }, ...pipeline, { $count: "total" }])
         pipeline.push({ $skip: (filter.page - 1) * filter.limit })
-        pipeline.push()
+        pipeline.push({ $limit: filter.limit })
         const data = await this.bookingModel.aggregate([
             {
                 $match: { userId: new ObjectId(id) }

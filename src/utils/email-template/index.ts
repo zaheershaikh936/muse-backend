@@ -60,3 +60,13 @@ export const userCancelBooking = async (to: string, data: Record<string, unknown
         return error;
     }
 }
+
+export const acceptBooking = async (to: string, data: Record<string, unknown>) => {
+    try {
+        const subject = `Your Booking has been accepted by ${(data.mentor as { name?: string })?.name}`;
+        const templateId = process.env.ACCEPT_BOOKING_TEMPLATE_ID || "";
+        return await sendMail(to, subject, templateId, data);
+    } catch (error) {
+        return error;
+    }
+}
