@@ -35,8 +35,7 @@ async function bootstrap() {
     origin: corsOptions.origin,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders:
-      '*',
+    allowedHeaders: '*',
     preflightContinue: false,
     optionsSuccessStatus: 200,
   });

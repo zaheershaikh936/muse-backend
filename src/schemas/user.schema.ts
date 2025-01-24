@@ -19,7 +19,10 @@ export class User {
   @Prop({ default: false })
   isMentor: boolean;
 
-  @Prop({ default: 'https://muse-upload-bucket.s3.eu-west-2.amazonaws.com/2024/12/17/image/default-avatar-icon-of-social-media-user-vector.jpg' })
+  @Prop({
+    default:
+      'https://muse-upload-bucket.s3.eu-west-2.amazonaws.com/2024/12/17/image/default-avatar-icon-of-social-media-user-vector.jpg',
+  })
   image: string;
 
   @Prop({ default: Date.now })
