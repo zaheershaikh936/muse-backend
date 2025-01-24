@@ -4,7 +4,7 @@ import { MentorBookingService } from './mentor-booking/bookingsMentor.service';
 import { BookingsController } from './bookings.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Booking, BookingSchema } from 'src/schemas';
-import { MentorModule, PaymentModule, UsersModule, } from '../index';
+import { MentorModule, PaymentModule, UsersModule } from '../index';
 
 @Module({
   imports: [
@@ -15,6 +15,6 @@ import { MentorModule, PaymentModule, UsersModule, } from '../index';
   ],
   controllers: [BookingsController],
   providers: [BookingsService, MentorBookingService],
-  exports: [MentorBookingService, BookingsService]
+  exports: [MentorBookingService, BookingsService],
 })
-export class BookingsModule { }
+export class BookingsModule {}

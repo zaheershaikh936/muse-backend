@@ -37,10 +37,7 @@ export class UsersService {
 
   findOneForBooking(id: string) {
     return this.userModel
-      .findOne(
-        { _id: id },
-        { _id: 1, email: 1, name: 1, image: 1 },
-      )
+      .findOne({ _id: id }, { _id: 1, email: 1, name: 1, image: 1 })
       .lean();
   }
 }

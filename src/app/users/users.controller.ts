@@ -1,4 +1,14 @@
-import { Controller, Body, UseGuards, Patch, Param, Get, Query, Delete, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  UseGuards,
+  Patch,
+  Param,
+  Get,
+  Query,
+  Delete,
+  Logger,
+} from '@nestjs/common';
 import { UsersService } from './user/users.service';
 import { UpdateUserDto } from './dto/user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,9 +32,22 @@ export class UsersController {
     try {
       updateUserDto.updatedAt = new Date();
       if (updateUserDto.isMentor) {
-        const userId = slugHelper(updateUserDto.name)
-        Logger.debug({ name: updateUserDto.name, image: updateUserDto.image, userId: userId, email: updateUserDto.email })
-        await this.profileService.create({ userId: id, user: { name: updateUserDto.name, image: updateUserDto.image, userId: userId, email: updateUserDto.email } });
+        const userId = slugHelper(updateUserDto.name);
+        Logger.debug({
+          name: updateUserDto.name,
+          image: updateUserDto.image,
+          userId: userId,
+          email: updateUserDto.email,
+        });
+        await this.profileService.create({
+          userId: id,
+          user: {
+            name: updateUserDto.name,
+            image: updateUserDto.image,
+            userId: userId,
+            email: updateUserDto.email,
+          },
+        });
       }
       delete updateUserDto.email;
       return this.usersService.update(id, updateUserDto);
@@ -36,12 +59,17 @@ export class UsersController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/bookings')
-  async getUserBookings(@User('_id') id: string, @Query('status') status: string, @Query('limit') limit: number, @Query('page') page: number) {
+  async getUserBookings(
+    @User('_id') id: string,
+    @Query('status') status: string,
+    @Query('limit') limit: number,
+    @Query('page') page: number,
+  ) {
     const filter = {
       status: status?.length ? status.split(',') : [],
       limit: limit || 10,
       page: page || 1,
-    }
+    };
     return this.bookingService.getUserBookings(id, filter);
   }
 

@@ -173,7 +173,7 @@ export class ProfessionService {
       },
       {
         $limit: 10,
-      }
+      },
     ]);
   }
 }

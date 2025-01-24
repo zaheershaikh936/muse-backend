@@ -13,8 +13,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { PaymentModule } from './payment/payment.module';
 import { ReviewsModule } from './reviews/reviews.module';
-
-
+import { SupportModule } from './support/support.module';
 
 export {
   AuthModule,
@@ -31,5 +30,6 @@ export {
   FileUploadModule,
   InvoiceModule,
   PaymentModule,
-  ReviewsModule
+  ReviewsModule,
+  SupportModule,
 };

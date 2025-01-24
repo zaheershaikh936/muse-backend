@@ -3,9 +3,16 @@ import axios from 'axios';
 import * as qs from 'qs';
 @Injectable()
 export class PaymentService {
-  private baseUrl = process.env.PAYPAL_ENV === 'live' ? process.env.PAYPAL_CLIENT_URL : process.env.PAYPAL_SANDBOX_CLIENT_URL;
+  private baseUrl =
+    process.env.PAYPAL_ENV === 'live'
+      ? process.env.PAYPAL_CLIENT_URL
+      : process.env.PAYPAL_SANDBOX_CLIENT_URL;
 
-  async createPayment(body: { price: string, successUrl: string, cancelUrl: string }) {
+  async createPayment(body: {
+    price: string;
+    successUrl: string;
+    cancelUrl: string;
+  }) {
     console.log(1.1);
     const accessToken = await this.paypalAuth();
 
@@ -37,7 +44,10 @@ export class PaymentService {
       const response = await axios.request(config);
       return response.data.access_token;
     } catch (error) {
-      console.error('Error fetching PayPal token:', error.response?.data || error.message);
+      console.error(
+        'Error fetching PayPal token:',
+        error.response?.data || error.message,
+      );
       throw new Error('Failed to fetch PayPal token');
     }
   }
@@ -47,24 +57,27 @@ export class PaymentService {
     const clientSecret = process.env.PAYPAL_SECRET_KEY;
     const credentials = `${clientId}:${clientSecret}`;
     return `Basic ${Buffer.from(credentials).toString('base64')}`;
-  };
+  }
 
-  async createOrder(accessToken: string, body: { price: string, successUrl: string, cancelUrl: string }) {
+  async createOrder(
+    accessToken: string,
+    body: { price: string; successUrl: string; cancelUrl: string },
+  ) {
     const data = JSON.stringify({
-      "intent": "CAPTURE",
-      "purchase_units": [
+      intent: 'CAPTURE',
+      purchase_units: [
         {
-          "amount": {
-            "currency_code": "USD",
-            "value": body.price.toString()
-          }
-        }
+          amount: {
+            currency_code: 'USD',
+            value: body.price.toString(),
+          },
+        },
       ],
-      "application_context": {
-        "return_url": body.successUrl,
-        "cancel_url": body.cancelUrl,
-        "user_action": "PAY_NOW"
-      }
+      application_context: {
+        return_url: body.successUrl,
+        cancel_url: body.cancelUrl,
+        user_action: 'PAY_NOW',
+      },
     });
 
     try {
@@ -74,13 +87,13 @@ export class PaymentService {
         url: `${this.baseUrl}/v2/checkout/orders`,
         headers: {
           'Content-Type': 'application/json',
-          'Prefer': 'return=representation',
-          'Authorization': `Bearer ${accessToken}`
+          Prefer: 'return=representation',
+          Authorization: `Bearer ${accessToken}`,
         },
-        data: data
+        data: data,
       };
       const response = await axios.request(config);
-      return response
+      return response;
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
     }
@@ -94,12 +107,12 @@ export class PaymentService {
         url: `${this.baseUrl}/v2/checkout/orders/${id}/capture`,
         headers: {
           'Content-Type': 'application/json',
-          'Prefer': 'return=representation',
-          'Authorization': `Bearer ${accessToken}`,
+          Prefer: 'return=representation',
+          Authorization: `Bearer ${accessToken}`,
         },
       };
       const response = await axios.request(config);
-      return response.data
+      return response.data;
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
     }
@@ -114,8 +127,8 @@ export class PaymentService {
         url: `${this.baseUrl}/v2/payments/captures/${id}/refund`,
         headers: {
           'Content-Type': 'application/json',
-          'Prefer': 'return=representation',
-          'Authorization': `Bearer ${accessToken}`,
+          Prefer: 'return=representation',
+          Authorization: `Bearer ${accessToken}`,
         },
       };
       const response = await axios.request(config);
@@ -124,6 +137,4 @@ export class PaymentService {
       console.error('Error:', error.response?.data || error.message);
     }
   }
-
 }
-

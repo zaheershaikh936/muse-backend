@@ -11,4 +11,4 @@ import { Review, ReviewSchema } from 'src/schemas';
   controllers: [ReviewsController],
   providers: [ReviewsService],
 })
-export class ReviewsModule { }
+export class ReviewsModule {}

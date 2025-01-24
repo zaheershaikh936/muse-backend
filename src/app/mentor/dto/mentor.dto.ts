@@ -19,7 +19,6 @@ export class GetMentorDto {
   sort: any;
 }
 
-
 export type MentorFilterType = {
   status?: string[];
   limit?: number;

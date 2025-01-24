@@ -18,11 +18,13 @@ export class FileUploadService {
     return data;
   }
 
-
   async generateInvoice(buffer: Buffer) {
     const folderPath = this.getFolderPath();
-    const sanitizedFileName = "test.pdf";
-    const result: Record<string, unknown> = (await this.uploadS3(buffer, `${folderPath}/${sanitizedFileName}`)) as Record<string, unknown>;
+    const sanitizedFileName = 'test.pdf';
+    const result: Record<string, unknown> = (await this.uploadS3(
+      buffer,
+      `${folderPath}/${sanitizedFileName}`,
+    )) as Record<string, unknown>;
     return result?.Location;
   }
 

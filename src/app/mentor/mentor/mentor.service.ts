@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
 @Injectable()
 export class MentorService {
-  constructor(@InjectModel(Mentor.name) private mentorModel: Model<Mentor>) { }
+  constructor(@InjectModel(Mentor.name) private mentorModel: Model<Mentor>) {}
 
   async featuredMentors() {
     return await this.mentorModel.aggregate([
@@ -74,7 +74,10 @@ export class MentorService {
   }
 
   getMentorId(userId: string) {
-    return this.mentorModel.findOne({ userId: new ObjectId(userId) }, { _id: 1, user: 1 }).lean().exec();
+    return this.mentorModel
+      .findOne({ userId: new ObjectId(userId) }, { _id: 1, user: 1 })
+      .lean()
+      .exec();
   }
 
   findOneForBooking(id: string) {
@@ -82,7 +85,10 @@ export class MentorService {
   }
 
   getMentorIdByUserId(id: string) {
-    return this.mentorModel.findOne({ userId: new ObjectId(id) }, { _id: 1 }).lean().exec();
+    return this.mentorModel
+      .findOne({ userId: new ObjectId(id) }, { _id: 1 })
+      .lean()
+      .exec();
   }
 
   getSuggestions(search: string) {
@@ -100,16 +106,15 @@ export class MentorService {
       },
       {
         $project: {
-          _id: "$user.userId",
-          slag: "",
-          name: "$user.name",
+          _id: '$user.userId',
+          slag: '',
+          name: '$user.name',
           category: 'mentor',
         },
       },
       {
         $limit: 15,
-      }
+      },
     ]);
   }
-
 }

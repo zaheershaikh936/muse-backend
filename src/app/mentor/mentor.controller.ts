@@ -21,7 +21,10 @@ import {
 } from './dto/profile.dto';
 import { JwtAuthGuard } from 'src/utils/guard/jwt-user.guards';
 import { Request } from 'src/utils/types/index';
-import { ExperienceMentorDto, UpdateExperienceMentorDto } from './dto/experience.dto';
+import {
+  ExperienceMentorDto,
+  UpdateExperienceMentorDto,
+} from './dto/experience.dto';
 import { RoleService } from '../role/role/role.service';
 import { User } from 'src/utils/decorator/user.decorator';
 import { GetMentorDto } from './dto/mentor.dto';
@@ -41,14 +44,19 @@ export class MentorController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/bookings')
-  async mentorBooking(@User('_id') id: string, @Query('status') status: string, @Query('limit') limit: number, @Query('page') page: number) {
+  async mentorBooking(
+    @User('_id') id: string,
+    @Query('status') status: string,
+    @Query('limit') limit: number,
+    @Query('page') page: number,
+  ) {
     const filter = {
       status: status?.length ? status.split(',') : [],
       limit: limit || 10,
       page: page || 1,
-    }
+    };
     const mentor = await this.mentorService.getMentorIdByUserId(id);
-    return this.bookingService.mentorBookings(mentor._id.toString(), filter)
+    return this.bookingService.mentorBookings(mentor._id.toString(), filter);
   }
 
   @Get('suggestions')
@@ -155,10 +163,18 @@ export class MentorController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/experience/:id')
-  async updateExperience(@User('_id') sub: string, @Param() id: string, @Body() experienceMentorDto: UpdateExperienceMentorDto) {
+  async updateExperience(
+    @User('_id') sub: string,
+    @Param() id: string,
+    @Body() experienceMentorDto: UpdateExperienceMentorDto,
+  ) {
     experienceMentorDto.userId = sub;
     const data = await this.experienceService.update(id, experienceMentorDto);
-    if (data) await this.profileService.findAndUpdateExperienceById(experienceMentorDto, data?._id.toString())
+    if (data)
+      await this.profileService.findAndUpdateExperienceById(
+        experienceMentorDto,
+        data?._id.toString(),
+      );
     return data;
   }
 
@@ -170,7 +186,11 @@ export class MentorController {
   ) {
     experienceMentorDto.userId = id;
     const data = await this.experienceService.create(experienceMentorDto);
-    if (data) await this.profileService.updateExperience(experienceMentorDto, data?._id)
+    if (data)
+      await this.profileService.updateExperience(
+        experienceMentorDto,
+        data?._id,
+      );
     return data;
   }
 
@@ -219,7 +239,7 @@ export class MentorController {
   @UseGuards(AuthGuard('jwt'))
   @Get('/bookings/kpi')
   async bookingMentorKpi(@User('_id') id: any) {
-    const mentor = await this.mentorService.getMentorIdByUserId(id)
-    return this.bookingService.bookingKpi(mentor._id.toString())
+    const mentor = await this.mentorService.getMentorIdByUserId(id);
+    return this.bookingService.bookingKpi(mentor._id.toString());
   }
 }

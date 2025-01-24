@@ -25,7 +25,10 @@ export class RegisterService {
       _id: String(user._id),
       role: user.role,
     });
-    await welcomeEmail(registerDTO.email.toLowerCase(), { name: registerDTO.name, website_url: process.env.WEB_URL })
+    await welcomeEmail(registerDTO.email.toLowerCase(), {
+      name: registerDTO.name,
+      website_url: process.env.WEB_URL,
+    });
     return {
       user: { name: user.name, email: user.email, role: user.role },
       token: { accessToken, refreshToken },

@@ -13,7 +13,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 @Injectable()
 export class ProfileService {
-  constructor(@InjectModel(Mentor.name) private mentorModel: Model<Mentor>) { }
+  constructor(@InjectModel(Mentor.name) private mentorModel: Model<Mentor>) {}
   isExist(userId: string) {
     return this.mentorModel.countDocuments({ userId }).lean();
   }
@@ -65,12 +65,18 @@ export class ProfileService {
                       { $cond: [{ $ifNull: ['$bio', false] }, 10, 0] },
                       { $cond: [{ $ifNull: ['$about', false] }, 10, 0] },
                       { $cond: [{ $gt: [{ $size: '$skills' }, 0] }, 10, 0] },
-                      { $cond: [{ $gt: [{ $size: '$experience' }, 0] }, 15, 0] },
+                      {
+                        $cond: [{ $gt: [{ $size: '$experience' }, 0] }, 15, 0],
+                      },
                       { $cond: [{ $ifNull: ['$location', false] }, 10, 0] },
-                      { $cond: [{ $ifNull: ['$profession.name', false] }, 5, 0] },
+                      {
+                        $cond: [{ $ifNull: ['$profession.name', false] }, 5, 0],
+                      },
                       { $cond: [{ $ifNull: ['$role.name', false] }, 5, 0] },
                       { $cond: [{ $ifNull: ['$tag', false] }, 5, 0] },
-                      { $cond: [{ $ifNull: ['$totalExperience', false] }, 5, 0] },
+                      {
+                        $cond: [{ $ifNull: ['$totalExperience', false] }, 5, 0],
+                      },
                     ],
                   },
                   100,
@@ -99,7 +105,7 @@ export class ProfileService {
           about: 1,
           role: 1,
           profession: 1,
-          profileCompletion: 1
+          profileCompletion: 1,
         },
       },
     ]);
@@ -138,40 +144,47 @@ export class ProfileService {
     );
   }
 
-
   findMentorExperience(userId: string) {
-    return this.mentorModel.findOne({ userId: new ObjectId(userId) }, { experience: 1 }).lean().exec();
+    return this.mentorModel
+      .findOne({ userId: new ObjectId(userId) }, { experience: 1 })
+      .lean()
+      .exec();
   }
 
   async updateExperience(experienceMentorDto: ExperienceMentorDto, id: string) {
     const mentor = await this.findMentorExperience(experienceMentorDto.userId);
-    const title = experienceMentorDto.positions[experienceMentorDto.positions.length - 1].title;
+    const title =
+      experienceMentorDto.positions[experienceMentorDto.positions.length - 1]
+        .title;
     const newExperienceEntry = {
       image: experienceMentorDto.image,
       company: experienceMentorDto.company,
       role: title,
-      experienceId: id
+      experienceId: id,
     };
-    const updatedExperience = [
-      ...mentor.experience,
-      newExperienceEntry
-    ];
+    const updatedExperience = [...mentor.experience, newExperienceEntry];
 
     await this.mentorModel.updateOne(
       { userId: new ObjectId(experienceMentorDto.userId) },
-      { $set: { experience: updatedExperience } }
+      { $set: { experience: updatedExperience } },
     );
-    return
+    return;
   }
 
-  async findAndUpdateExperienceById(experienceMentorDto: ExperienceMentorDto, experienceId: string) {
+  async findAndUpdateExperienceById(
+    experienceMentorDto: ExperienceMentorDto,
+    experienceId: string,
+  ) {
     const mentor = await this.findMentorExperience(experienceMentorDto.userId);
     if (!mentor) {
       throw new Error('Mentor not found');
     }
-    const title = experienceMentorDto.positions[experienceMentorDto.positions.length - 1].title;
+    const title =
+      experienceMentorDto.positions[experienceMentorDto.positions.length - 1]
+        .title;
     const experienceIndex = mentor.experience.findIndex(
-      (item: { experienceId: string }) => item.experienceId.toString() === experienceId
+      (item: { experienceId: string }) =>
+        item.experienceId.toString() === experienceId,
     );
     console.log('Experience index found:', experienceIndex);
 
@@ -180,12 +193,12 @@ export class ProfileService {
         ...mentor.experience[experienceIndex],
         image: experienceMentorDto.image,
         company: experienceMentorDto.company,
-        role: title
+        role: title,
       };
     }
     await this.mentorModel.updateOne(
       { userId: new ObjectId(experienceMentorDto.userId) },
-      { $set: { experience: mentor.experience } }
+      { $set: { experience: mentor.experience } },
     );
     return;
   }
