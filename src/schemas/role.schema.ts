@@ -50,7 +50,7 @@ RoleSchema.pre('save', async function (next) {
         .lean();
       if (!profession) throw new Error('Profession not found');
       this.profession.name = profession.name;
-    } catch (error) {
+    } catch (error: any) {
       Logger.error('Error fetching profession', error.message);
       return next(error);
     }

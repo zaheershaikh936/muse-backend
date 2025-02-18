@@ -41,7 +41,7 @@ const decryptBookingData = (encrypted: string): string[] => {
     );
     const originalData = bytes.toString(CryptoJS.enc.Utf8);
     return originalData.split(',');
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     return error;
   }

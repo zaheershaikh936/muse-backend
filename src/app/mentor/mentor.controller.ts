@@ -189,7 +189,7 @@ export class MentorController {
     if (data)
       await this.profileService.updateExperience(
         experienceMentorDto,
-        data?._id,
+        data?._id.toString(),
       );
     return data;
   }

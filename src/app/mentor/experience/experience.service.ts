@@ -15,12 +15,7 @@ export class ExperienceService {
   ) {}
 
   create(experienceMentorDto: ExperienceMentorDto) {
-    try {
-      return this.experienceModel.create(experienceMentorDto);
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+    return this.experienceModel.create(experienceMentorDto);
   }
 
   async getById(id: string) {

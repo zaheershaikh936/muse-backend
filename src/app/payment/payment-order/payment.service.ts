@@ -43,7 +43,7 @@ export class PaymentService {
 
       const response = await axios.request(config);
       return response.data.access_token;
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         'Error fetching PayPal token:',
         error.response?.data || error.message,
@@ -94,7 +94,7 @@ export class PaymentService {
       };
       const response = await axios.request(config);
       return response;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error.response?.data || error.message);
     }
   }
@@ -113,7 +113,7 @@ export class PaymentService {
       };
       const response = await axios.request(config);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error.response?.data || error.message);
     }
   }
@@ -133,7 +133,7 @@ export class PaymentService {
       };
       const response = await axios.request(config);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error.response?.data || error.message);
     }
   }
