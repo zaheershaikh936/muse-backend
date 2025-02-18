@@ -2,7 +2,6 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://muse-233s.vercel.app',
   'http://localhost:3001',
-  'https://muse-mentoring.vercel.app',
 ];
 
 const corsOptions = {
