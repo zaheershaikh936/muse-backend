@@ -1,5 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { LoginService } from './login/login.service';
+import { SocialAuthService } from './social-auth/social-auth.services';
 import { LogoutService } from './logout/logout.service';
 import { RegisterService } from './register/register.service';
 import { AuthController } from './auth.controller';
@@ -9,6 +10,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas';
 import { UsersModule } from '../index';
 import { JwtStrategy } from 'src/utils/common/auth/strategy/jwt.strategy';
+import { FirebaseModule } from '../firebase/firebase.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,9 +22,16 @@ import { JwtStrategy } from 'src/utils/common/auth/strategy/jwt.strategy';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
+    forwardRef(() => FirebaseModule),
     forwardRef(() => UsersModule),
   ],
-  providers: [LoginService, LogoutService, RegisterService, JwtStrategy],
+  providers: [
+    LoginService,
+    LogoutService,
+    RegisterService,
+    JwtStrategy,
+    SocialAuthService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

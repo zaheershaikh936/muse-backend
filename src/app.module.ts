@@ -17,6 +17,7 @@ import {
   PaymentModule,
   ReviewsModule,
   SupportModule,
+  FirebaseModule,
 } from './app';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
@@ -39,6 +40,7 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
     PaymentModule,
     ReviewsModule,
     SupportModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [

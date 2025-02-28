@@ -1,4 +1,10 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateUserDto {
   password: string;
@@ -22,4 +28,26 @@ export class UpdateUserDto {
   isMentor: boolean;
 
   updatedAt: Date;
+}
+
+export class SocialAuthDTO {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  provider: string;
+
+  @IsString()
+  @IsNotEmpty()
+  image: string;
+
+  @IsString()
+  @IsNotEmpty()
+  access_token: string;
 }

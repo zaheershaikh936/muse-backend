@@ -7,11 +7,18 @@ export class User {
   @Prop({ required: true, unique: true, searchIndex: true })
   email: string;
 
-  @Prop({ required: true, select: false, hidden: true })
+  @Prop({ required: false, select: false, hidden: true })
   password: string;
 
   @Prop({ required: true, default: 'user', enum: ['user', 'mentor', 'admin'] })
   role: string;
+
+  @Prop({
+    required: true,
+    default: 'email',
+    enum: ['github', 'google', 'email'],
+  })
+  provider: string;
 
   @Prop({ required: true, searchIndex: true })
   name: string;

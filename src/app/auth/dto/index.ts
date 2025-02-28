@@ -23,3 +23,25 @@ export class LoginDTO {
   @IsNotEmpty()
   password: string;
 }
+
+export class SocialRegisterDTO {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  provider: string;
+
+  @IsString()
+  @IsNotEmpty()
+  image: string;
+
+  @IsString()
+  @IsNotEmpty()
+  access_token: string;
+}

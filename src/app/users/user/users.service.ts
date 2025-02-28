@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from '../dto/user.dto';
+import { CreateUserDto, SocialAuthDTO, UpdateUserDto } from '../dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas';
 import { Model } from 'mongoose';
@@ -39,5 +39,9 @@ export class UsersService {
     return this.userModel
       .findOne({ _id: id }, { _id: 1, email: 1, name: 1, image: 1 })
       .lean();
+  }
+
+  async socialAuthCreate(createUserDto: SocialAuthDTO) {
+    return this.userModel.create(createUserDto);
   }
 }

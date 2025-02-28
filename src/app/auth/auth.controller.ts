@@ -4,19 +4,24 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Post,
   Req,
   Res,
 } from '@nestjs/common';
 import { RegisterService } from './register/register.service';
-import { LoginDTO, RegisterDTO } from './dto';
+import { LoginDTO, RegisterDTO, SocialRegisterDTO } from './dto';
 import { LoginService } from './login/login.service';
 import { Response, Request } from 'express';
+import { SocialAuthService } from './social-auth/social-auth.services';
+import { FirebaseService } from '../firebase/firebase.service';
 @Controller('auth')
 export class AuthController {
   constructor(
     private registerService: RegisterService,
     private loginService: LoginService,
+    private socialAuthService: SocialAuthService,
+    private firebaseService: FirebaseService,
   ) {}
 
   @Post('/login')
@@ -54,5 +59,23 @@ export class AuthController {
   @Post('/register')
   registerUser(@Body() registerDTO: RegisterDTO) {
     return this.registerService.create(registerDTO);
+  }
+
+  @Post('/social-register')
+  async socialRegister(@Body() socialRegisterBody: SocialRegisterDTO) {
+    switch (socialRegisterBody.provider) {
+      case 'github':
+        Logger.log('Github Auth');
+        return this.socialAuthService.githubAuth(socialRegisterBody);
+      case 'google':
+        await this.firebaseService.firebaseUserIsExist(
+          socialRegisterBody.email,
+        );
+        return this.socialAuthService.googleAuth(socialRegisterBody);
+      default:
+        break;
+    }
+    if (socialRegisterBody.provider === 'github') {
+    }
   }
 }
