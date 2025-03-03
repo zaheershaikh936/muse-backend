@@ -73,6 +73,14 @@ async function bootstrap() {
         'Too many accounts created from this IP, please try again after an hour',
     });
     app.use('/auth/email/register', createAccountLimiter);
+
+    const forgetPasswordLimiter = rateLimit({
+      windowMs: 24 * 60 * 60 * 1000, // 24 hours
+      max: 2, // start blocking after 2 requests
+      message:
+        'Too many accounts created from this IP, please try again after 24 hours',
+    });
+    app.use('/auth/forget-password', forgetPasswordLimiter);
   }
 
   await app.listen(port);

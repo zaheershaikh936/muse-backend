@@ -78,3 +78,16 @@ export const acceptBooking = async (
     return error;
   }
 };
+
+export const forgetPasswordTemplate = async (
+  to: string,
+  data: Record<string, unknown>,
+) => {
+  try {
+    const subject = 'Muse: Password Reset Request';
+    const templateId = process.env.FORGET_PASSWORD || '';
+    return await sendMail(to, subject, templateId, data);
+  } catch (error) {
+    return error;
+  }
+};

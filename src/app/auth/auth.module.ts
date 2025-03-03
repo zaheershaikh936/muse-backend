@@ -11,12 +11,12 @@ import { User, UserSchema } from 'src/schemas';
 import { UsersModule } from '../index';
 import { JwtStrategy } from 'src/utils/common/auth/strategy/jwt.strategy';
 import { FirebaseModule } from '../firebase/firebase.module';
+import { MagicLinkModule } from '../magic-link/magic-link.module';
+import { ForgetPasswordService } from './forget-password/forget-password.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -24,6 +24,7 @@ import { FirebaseModule } from '../firebase/firebase.module';
     }),
     forwardRef(() => FirebaseModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => MagicLinkModule),
   ],
   providers: [
     LoginService,
@@ -31,6 +32,7 @@ import { FirebaseModule } from '../firebase/firebase.module';
     RegisterService,
     JwtStrategy,
     SocialAuthService,
+    ForgetPasswordService,
   ],
   controllers: [AuthController],
 })

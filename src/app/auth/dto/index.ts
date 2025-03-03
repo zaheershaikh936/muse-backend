@@ -45,3 +45,29 @@ export class SocialRegisterDTO {
   @IsNotEmpty()
   access_token: string;
 }
+
+export class ForgetPasswordDTO {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
+export class VerifyForgetPasswordDTO {
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+}
+export class ResetForgetPasswordDTO {
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  conformPassword: string;
+
+  email: string;
+}

@@ -10,7 +10,7 @@ export class LoginService {
     private readonly registerService: RegisterService,
   ) {}
   async login(loginDto: LoginDTO) {
-    const isExist = await this.userService.isExist(loginDto.email);
+    const isExist = await this.userService.isExistWithPassword(loginDto.email);
     if (!isExist)
       throw new HttpException('Invalid email', HttpStatus.NOT_ACCEPTABLE);
     const user = await this.userService.findByEmail(loginDto.email);

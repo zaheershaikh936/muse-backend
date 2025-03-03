@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, SocialAuthDTO, UpdateUserDto } from '../dto/user.dto';
+import {
+  CreateUserDto,
+  ResetPasswordDTO,
+  SocialAuthDTO,
+  UpdateUserDto,
+} from '../dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas';
 import { Model } from 'mongoose';
@@ -11,6 +16,12 @@ export class UsersService {
 
   isExist(email: string) {
     return this.userModel.countDocuments({ email }).lean();
+  }
+
+  isExistWithPassword(email: string) {
+    return this.userModel
+      .countDocuments({ email: email, password: { $exists: true } })
+      .lean();
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -43,5 +54,13 @@ export class UsersService {
 
   async socialAuthCreate(createUserDto: SocialAuthDTO) {
     return this.userModel.create(createUserDto);
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDTO) {
+    const password = await hash(resetPasswordDto.password, 10);
+    return await this.userModel.findOneAndUpdate(
+      { email: resetPasswordDto.email },
+      { password: password },
+    );
   }
 }

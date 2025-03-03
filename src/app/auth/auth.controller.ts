@@ -10,10 +10,18 @@ import {
   Res,
 } from '@nestjs/common';
 import { RegisterService } from './register/register.service';
-import { LoginDTO, RegisterDTO, SocialRegisterDTO } from './dto';
+import {
+  ForgetPasswordDTO,
+  LoginDTO,
+  RegisterDTO,
+  ResetForgetPasswordDTO,
+  SocialRegisterDTO,
+  VerifyForgetPasswordDTO,
+} from './dto';
 import { LoginService } from './login/login.service';
 import { Response, Request } from 'express';
 import { SocialAuthService } from './social-auth/social-auth.services';
+import { ForgetPasswordService } from './forget-password/forget-password.service';
 import { FirebaseService } from '../firebase/firebase.service';
 @Controller('auth')
 export class AuthController {
@@ -22,6 +30,7 @@ export class AuthController {
     private loginService: LoginService,
     private socialAuthService: SocialAuthService,
     private firebaseService: FirebaseService,
+    private forgetPasswordService: ForgetPasswordService,
   ) {}
 
   @Post('/login')
@@ -77,5 +86,28 @@ export class AuthController {
     }
     if (socialRegisterBody.provider === 'github') {
     }
+  }
+
+  @Post('/forget-password')
+  async forgetPassword(@Body() forgetPasswordDTO: ForgetPasswordDTO) {
+    return this.forgetPasswordService.forgetPassword(forgetPasswordDTO);
+  }
+
+  @Post('/verify/forget-password')
+  async verifyForgetPassword(
+    @Body() verifyForgetPasswordDTO: VerifyForgetPasswordDTO,
+  ) {
+    return this.forgetPasswordService.verifyForgetPassword(
+      verifyForgetPasswordDTO,
+    );
+  }
+
+  @Post('/reset/forget-password')
+  async resetForgetPassword(
+    @Body() verifyForgetPasswordDTO: ResetForgetPasswordDTO,
+  ) {
+    return this.forgetPasswordService.resetForgetPassword(
+      verifyForgetPasswordDTO,
+    );
   }
 }

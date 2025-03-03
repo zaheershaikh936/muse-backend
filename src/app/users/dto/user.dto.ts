@@ -51,3 +51,13 @@ export class SocialAuthDTO {
   @IsNotEmpty()
   access_token: string;
 }
+
+export class ResetPasswordDTO {
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+}
