@@ -43,7 +43,14 @@ export class RegisterService {
       website_url: process.env.WEB_URL,
     });
     return {
-      user: { name: user.name, email: user.email, role: user.role },
+      user: {
+        sub: user._id,
+        isMentor: false,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+      },
       token: { accessToken, refreshToken },
     };
   }
