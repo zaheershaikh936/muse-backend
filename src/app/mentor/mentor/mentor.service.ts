@@ -36,12 +36,13 @@ export class MentorService {
   async getAll(body: GetMentorDto) {
     const filter = getMentorFilter(body.filter);
     const pipeline = [...filter];
-    const [{ total = 0 }] = await this.mentorModel.aggregate([
+    const [count = { total: 0 }] = await this.mentorModel.aggregate([
       ...pipeline,
       {
         $count: 'total',
       },
     ]);
+
     const data = await this.mentorModel.aggregate([
       ...pipeline,
       {
@@ -59,7 +60,7 @@ export class MentorService {
         $sort: body.sort,
       },
     ]);
-    return { total, data };
+    return { total: count.total, data };
   }
 
   async getMentorById(id: string) {

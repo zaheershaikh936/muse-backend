@@ -25,6 +25,22 @@ export const getMentorFilter = (filter: Record<string, any>) => {
       },
     });
   }
+  if (filter?.companies && filter?.companies?.length) {
+    const regexArray = filter.companies.map(
+      (company: string) => new RegExp(company, 'i'),
+    );
+    pipeline.push({
+      $match: {
+        experience: {
+          $elemMatch: {
+            company: {
+              $in: regexArray,
+            },
+          },
+        },
+      },
+    });
+  }
   if (filter.skills && filter.skills.length) {
     const regexArray = filter.skills.map(
       (skill: string) => new RegExp(skill, 'i'),

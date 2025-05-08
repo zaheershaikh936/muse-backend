@@ -31,6 +31,7 @@ import { GetMentorDto } from './dto/mentor.dto';
 import { MentorBookingService } from '../bookings/mentor-booking/bookingsMentor.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ProfessionService } from '../profession/profession/profession.service';
+
 @Controller('mentor')
 export class MentorController {
   constructor(
@@ -204,7 +205,6 @@ export class MentorController {
     return this.mentorService.featuredMentors();
   }
 
-  // mentor/get-all
   @Post('/get-all')
   async getAllMentor(@Body() body: GetMentorDto) {
     return this.mentorService.getAll(body);
