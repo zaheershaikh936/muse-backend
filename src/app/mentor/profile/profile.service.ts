@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   CreateProfileDTO,
   UpdateAboutDTO,
@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Mentor } from 'src/schemas';
 import mongoose, { Model } from 'mongoose';
 import { ExperienceMentorDto } from '../dto/experience.dto';
+import { mentorApplicationReceived } from 'src/utils/email-template';
 const ObjectId = mongoose.Types.ObjectId;
 
 @Injectable()
@@ -17,9 +18,12 @@ export class ProfileService {
   isExist(userId: string) {
     return this.mentorModel.countDocuments({ userId }).lean();
   }
-  async create(createMentorDto: unknown) {
-    const mentor = new this.mentorModel(createMentorDto);
-    return await mentor.save();
+
+  async create(createMentorDto: any) {
+    await mentorApplicationReceived(createMentorDto.user.email, {
+      user: createMentorDto.user.name,
+    });
+    return await this.mentorModel.create(createMentorDto);
   }
 
   async getProfile(userId: string) {
@@ -109,6 +113,10 @@ export class ProfileService {
         },
       },
     ]);
+    Logger.log(data.verified, 'data.verified');
+    Logger.log(data.profileCompletion, 'data.profileCompletion');
+    if (!data.verified && data.profileCompletion >= 90)
+      await this.mentorModel.findByIdAndUpdate(data._id, { verified: true });
     return data;
   }
 

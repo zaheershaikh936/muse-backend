@@ -91,3 +91,29 @@ export const forgetPasswordTemplate = async (
     return error;
   }
 };
+
+export const mentorApplicationReceived = async (
+  to: string,
+  data: Record<string, unknown>,
+) => {
+  try {
+    const subject = 'Muse: Mentor Application Received';
+    const templateId = process.env.MENTOR_APPLICATION_RECEIVED;
+    return await sendMail(to, subject, templateId, data);
+  } catch (error) {
+    return error;
+  }
+};
+
+export const mentorApplicationApproved = async (
+  to: string,
+  data: Record<string, unknown>,
+) => {
+  try {
+    const subject = 'Muse: Mentor Application Approved';
+    const templateId = process.env.MENTOR_APPLICATION_APPROVED;
+    return await sendMail(to, subject, templateId, data);
+  } catch (error) {
+    return error;
+  }
+};

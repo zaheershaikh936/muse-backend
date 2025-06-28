@@ -20,3 +20,55 @@ payment gateway
 
 !Code updates
 -> store usedId in user object for seo to fetch with name and it should be uinique
+
+/ const userId = slugHelper(updateUserDto.name);
+// Logger.debug({
+//   name: updateUserDto.name,
+//   image: updateUserDto.image,
+//   userId: userId,
+//   email: updateUserDto.email,
+// });
+// await this.profileService.create({
+//   userId: id,
+//   user: {
+//     name: updateUserDto.name,
+//     image: updateUserDto.image,
+//     userId: userId,
+//     email: updateUserDto.email,
+//   },
+// });
+
+
+//!   "userId": {
+//     "$oid": "6710157c4984af7f02ebc28f"
+//   },
+//     "location": {
+//     "city": "Karnataka,",
+//       "country": "India",
+//         "flag": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
+//   },
+//   "profession": {
+//     "_id": {
+//       "$oid": "66e30fa1b612ece777d63688"
+//     },
+//     "name": "Software Developer",
+//       "slag": "software-developer"
+//   },
+//   "role": {
+//     "_id": {
+//       "$oid": "66e33616cc217f60740895da"
+//     },
+//     "name": "Mobile Developer",
+//       "slag": "mobile-developer"
+//   },
+//   "about": "I want to be a guide to my mentees. Mentors are always required at every stage of life. Some people to get mentors at the right ti...",
+//     "user": {
+//     "name": "Anarghya Kini",
+//       "email": "anarghyaKini@gmail.com",
+//         "image": "https://www.preplaced.in/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fpreplaced-upload-prod%2Fo%2Fimage%252Fmentor-profile%252FAnarghya%2520Kinirec4B9R7jrAPQKGzx%3Falt%3Dmedia%26token%3D16d5e78b-3214-4766-94f7-6197bd1c588a&w=384&q=75",
+//           "userId": "anarghya-kini"
+//   },
+//   "tag": "Working Professional",
+//     "totalExperience": 2,
+//       "bgImage": "https://www.preplaced.in/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fpreplaced-upload-prod%2Fo%2Fmentor-dashboard%252Fcover-image%252FShubham%2520Khanna%2520-%2520rec6VjaEOivpkEAGq%3Falt%3Dmedia%26token%3D87472b20-4bc2-4a28-8645-03b8ae495b04&w=2048&q=75"
+// }

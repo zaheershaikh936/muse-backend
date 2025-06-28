@@ -13,6 +13,9 @@ export class MentorService {
   async featuredMentors() {
     return await this.mentorModel.aggregate([
       {
+        $match: { verified: true },
+      },
+      {
         $limit: 20,
       },
       {
@@ -68,6 +71,7 @@ export class MentorService {
       {
         $match: {
           'user.userId': id,
+          verified: true,
         },
       },
     ]);
@@ -97,6 +101,7 @@ export class MentorService {
     return this.mentorModel.aggregate([
       {
         $match: {
+          verified: true,
           $or: [
             { 'user.name': { $regex: searchRegex } },
             { 'user.profession': { $regex: searchRegex } },

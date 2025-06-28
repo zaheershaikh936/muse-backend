@@ -12,7 +12,7 @@ import {
 import { MentorService } from './mentor/mentor.service';
 import { ProfileService } from './profile/profile.service';
 import { ExperienceService } from './experience/experience.service';
-
+import { getIso2Code } from 'src/utils/api/getLocation';
 import {
   CreateProfileDTO,
   UpdateAboutDTO,
@@ -76,7 +76,7 @@ export class MentorController {
   ) {
     createMentorDto.userId = request.user._id;
     const isExist = await this.profileService.isExist(createMentorDto.userId);
-    const iso2: { iso2: string; flag: string } = await this.getIso2Code(
+    const iso2: { iso2: string; flag: string } = await getIso2Code(
       createMentorDto.location.country,
     );
     createMentorDto.location.flag = iso2.flag;
@@ -91,42 +91,6 @@ export class MentorController {
     } else {
       return this.profileService.update(createMentorDto);
     }
-  }
-
-  async getIso2Code(country: string) {
-    const response = await fetch(
-      'https://countriesnow.space/api/v0.1/countries/states',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          country: country,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        redirect: 'follow' as RequestRedirect,
-      },
-    );
-    const data = await response.json();
-    const iso2: string = data?.data?.iso2;
-    const raw = JSON.stringify({
-      iso2: iso2,
-    });
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: raw,
-      redirect: 'follow' as RequestRedirect,
-    };
-
-    const flagResponse = await fetch(
-      'https://countriesnow.space/api/v0.1/countries/flag/images',
-      requestOptions,
-    );
-    const flagData = await flagResponse.json();
-    return { iso2, flag: flagData?.data?.flag };
   }
 
   @UseGuards(JwtAuthGuard)

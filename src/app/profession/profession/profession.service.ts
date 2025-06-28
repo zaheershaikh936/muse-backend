@@ -66,7 +66,10 @@ export class ProfessionService {
             {
               $match: {
                 $expr: {
-                  $eq: ['$profession._id', '$$professionId'],
+                  $and: [
+                    { $eq: ['$profession._id', '$$professionId'] },
+                    { $eq: ['$verified', true] },
+                  ],
                 },
               },
             },

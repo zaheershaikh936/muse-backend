@@ -3,12 +3,12 @@ import {
   CreateUserDto,
   ResetPasswordDTO,
   SocialAuthDTO,
-  UpdateUserDto,
 } from '../dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas';
 import { Model } from 'mongoose';
 import { hash } from 'bcrypt';
+import { mentorApplicationApproved } from 'src/utils/email-template';
 
 @Injectable()
 export class UsersService {
@@ -40,10 +40,12 @@ export class UsersService {
       .lean();
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel
-      .findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
-      .lean();
+  async update(id: string, updateUserDto: any) {
+    const user = await this.userModel
+    .findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
+    .lean();
+    if (updateUserDto.isMentor) await mentorApplicationApproved(user.email, { user: user.name, }); 
+    return user;
   }
 
   findOneForBooking(id: string) {
