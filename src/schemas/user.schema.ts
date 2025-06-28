@@ -7,11 +7,18 @@ export class User {
   @Prop({ required: true, unique: true, searchIndex: true })
   email: string;
 
-  @Prop({ required: true, select: false, hidden: true })
+  @Prop({ required: false, select: false, hidden: true })
   password: string;
 
   @Prop({ required: true, default: 'user', enum: ['user', 'mentor', 'admin'] })
   role: string;
+
+  @Prop({
+    required: true,
+    default: 'email',
+    enum: ['github', 'google', 'email'],
+  })
+  provider: string;
 
   @Prop({ required: true, searchIndex: true })
   name: string;
@@ -19,7 +26,10 @@ export class User {
   @Prop({ default: false })
   isMentor: boolean;
 
-  @Prop({ default: 'https://muse-upload-bucket.s3.eu-west-2.amazonaws.com/2024/12/17/image/default-avatar-icon-of-social-media-user-vector.jpg' })
+  @Prop({
+    default:
+      'https://muse-upload-bucket.s3.eu-west-2.amazonaws.com/2024/12/17/image/default-avatar-icon-of-social-media-user-vector.jpg',
+  })
   image: string;
 
   @Prop({ default: Date.now })

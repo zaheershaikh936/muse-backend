@@ -4,7 +4,6 @@ export interface Request extends ExpressRequest {
   user?: any;
 }
 
-
 export interface TimeSlotT {
   day: number;
   dayString: string;
@@ -18,26 +17,25 @@ export interface AvailabilityT {
   [key: string]: TimeSlotT[];
 }
 
-
 export interface PaymentCreateOrderResT {
-  id: string
-  purchase_units: PurchaseUnit[]
-  create_time: string
-  links: Link[]
+  id: string;
+  purchase_units: PurchaseUnit[];
+  create_time: string;
+  links: Link[];
 }
 
 export interface PurchaseUnit {
-  reference_id: string
-  amount: Amount
+  reference_id: string;
+  amount: Amount;
 }
 
 export interface Amount {
-  currency_code: string
-  value: string
+  currency_code: string;
+  value: string;
 }
 
 export interface Link {
-  href: string
-  rel: string
-  method: string
+  href: string;
+  rel: string;
+  method: string;
 }

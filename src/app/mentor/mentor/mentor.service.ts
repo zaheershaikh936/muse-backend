@@ -8,10 +8,13 @@ import mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
 @Injectable()
 export class MentorService {
-  constructor(@InjectModel(Mentor.name) private mentorModel: Model<Mentor>) { }
+  constructor(@InjectModel(Mentor.name) private mentorModel: Model<Mentor>) {}
 
   async featuredMentors() {
     return await this.mentorModel.aggregate([
+      {
+        $match: { verified: true },
+      },
       {
         $limit: 20,
       },
@@ -36,12 +39,13 @@ export class MentorService {
   async getAll(body: GetMentorDto) {
     const filter = getMentorFilter(body.filter);
     const pipeline = [...filter];
-    const [{ total = 0 }] = await this.mentorModel.aggregate([
+    const [count = { total: 0 }] = await this.mentorModel.aggregate([
       ...pipeline,
       {
         $count: 'total',
       },
     ]);
+
     const data = await this.mentorModel.aggregate([
       ...pipeline,
       {
@@ -59,7 +63,7 @@ export class MentorService {
         $sort: body.sort,
       },
     ]);
-    return { total, data };
+    return { total: count.total, data };
   }
 
   async getMentorById(id: string) {
@@ -67,6 +71,7 @@ export class MentorService {
       {
         $match: {
           'user.userId': id,
+          verified: true,
         },
       },
     ]);
@@ -74,7 +79,10 @@ export class MentorService {
   }
 
   getMentorId(userId: string) {
-    return this.mentorModel.findOne({ userId: new ObjectId(userId) }, { _id: 1, user: 1 }).lean().exec();
+    return this.mentorModel
+      .findOne({ userId: new ObjectId(userId) }, { _id: 1, user: 1 })
+      .lean()
+      .exec();
   }
 
   findOneForBooking(id: string) {
@@ -82,7 +90,10 @@ export class MentorService {
   }
 
   getMentorIdByUserId(id: string) {
-    return this.mentorModel.findOne({ userId: new ObjectId(id) }, { _id: 1 }).lean().exec();
+    return this.mentorModel
+      .findOne({ userId: new ObjectId(id) }, { _id: 1 })
+      .lean()
+      .exec();
   }
 
   getSuggestions(search: string) {
@@ -90,6 +101,7 @@ export class MentorService {
     return this.mentorModel.aggregate([
       {
         $match: {
+          verified: true,
           $or: [
             { 'user.name': { $regex: searchRegex } },
             { 'user.profession': { $regex: searchRegex } },
@@ -100,16 +112,15 @@ export class MentorService {
       },
       {
         $project: {
-          _id: "$user.userId",
-          slag: "",
-          name: "$user.name",
+          _id: '$user.userId',
+          slag: '',
+          name: '$user.name',
           category: 'mentor',
         },
       },
       {
         $limit: 15,
-      }
+      },
     ]);
   }
-
 }

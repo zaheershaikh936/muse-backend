@@ -21,7 +21,12 @@ import {
 
 import { Booking, BookingDocument, BookingSchema } from './bookings.schema';
 import { Review, ReviewDocument, ReviewSchema } from './reviews.schema';
-
+import { Support, SupportDocument, SupportSchema } from './support.schema';
+import {
+  MagicLinkDocument,
+  MagicLinkSchema,
+  MagicLink,
+} from './magic-link.schema';
 
 export {
   employmentType,
@@ -51,5 +56,11 @@ export {
   BookingSchema,
   Review,
   ReviewDocument,
-  ReviewSchema
+  ReviewSchema,
+  Support,
+  SupportDocument,
+  SupportSchema,
+  MagicLinkDocument,
+  MagicLinkSchema,
+  MagicLink,
 };

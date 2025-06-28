@@ -15,7 +15,9 @@ import {
   FileUploadModule,
   InvoiceModule,
   PaymentModule,
-  ReviewsModule
+  ReviewsModule,
+  SupportModule,
+  FirebaseModule,
 } from './app';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
@@ -36,7 +38,9 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
     FileUploadModule,
     InvoiceModule,
     PaymentModule,
-    ReviewsModule
+    ReviewsModule,
+    SupportModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [

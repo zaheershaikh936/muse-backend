@@ -28,4 +28,4 @@ import { ProfessionModule } from '../profession/profession.module';
   providers: [MentorService, ProfileService, ExperienceService],
   exports: [ProfileService, MentorService],
 })
-export class MentorModule { }
+export class MentorModule {}
