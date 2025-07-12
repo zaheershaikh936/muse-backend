@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { UsersService } from 'src/app/users/user/users.service';
 import { LoginDTO } from '../dto';
 import { compareSync } from 'bcrypt';
@@ -11,8 +11,16 @@ export class LoginService {
   ) {}
   async login(loginDto: LoginDTO) {
     const isExist = await this.userService.isExistWithPassword(loginDto.email);
-    if (!isExist)
+    if (!isExist) {
+      const user = await this.userService.isExistWithType(loginDto.email);
+      Logger.debug(user);
+      if (user)
+        throw new HttpException(
+          `This email is linked to a ${user.provider} account. Please log in using ${user.provider}.`,
+          HttpStatus.NOT_ACCEPTABLE,
+        );
       throw new HttpException('Invalid email', HttpStatus.NOT_ACCEPTABLE);
+    }
     const user = await this.userService.findByEmail(loginDto.email);
     const isValid = compareSync(loginDto.password, user.password);
     if (!isValid)

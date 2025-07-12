@@ -24,7 +24,7 @@ export class RegisterService {
     const isExist = await this.userService.isExist(registerDTO.email);
     if (isExist)
       throw new HttpException(
-        'User already exist',
+        'This email is already registered. Please try to login.',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     const user = await this.userService.create(registerDTO);
