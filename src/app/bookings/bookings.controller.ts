@@ -67,7 +67,7 @@ export class BookingsController {
       booking?.booking?.endTime.toString(),
     );
     const redirectBaseUrl =
-      process.env.PAYPAL_ENV !== 'live'
+      process.env.REDIRECT_NODE_ENV === 'dev'
         ? process.env.REDIRECT_URL_LOCAL
         : process.env.REDIRECT_URL_PROD;
     const body = {
