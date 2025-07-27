@@ -23,17 +23,17 @@ export class RoleService {
     return this.roleModel.aggregate([
       {
         $match: {
-          name: { $regex: search, $options: 'i' }
+          name: { $regex: search, $options: 'i' },
         },
       },
       {
         $project: {
-          professionSlug: '$profession.slug', 
+          professionSlug: '$profession.slug',
           name: 1,
           slag: 1,
-          category: 'role'
-        }
-      }
+          category: 'role',
+        },
+      },
     ]);
   }
 }

@@ -2,17 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppService } from './app.service';
 
 describe('AppService', () => {
-    let service: AppService;
+  let service: AppService;
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [AppService],
-        }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [AppService],
+    }).compile();
 
-        service = module.get<AppService>(AppService);
-    });
+    service = module.get<AppService>(AppService);
+  });
 
-    it('should return "Muse backend is running!"', () => {
-        expect(service.healthCheckUp()).toBe('Muse backend is running!');
-    });
+  it('should return "Muse backend is running!"', () => {
+    expect(service.healthCheckUp()).toBe('Muse backend is running!');
+  });
 });

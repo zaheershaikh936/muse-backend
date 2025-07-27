@@ -4,9 +4,7 @@ import { InvoiceController } from './invoice.controller';
 import { FileUploadModule } from '../file-upload/file-upload.module';
 
 @Module({
-  imports: [
-    forwardRef(() => FileUploadModule),
-  ],
+  imports: [forwardRef(() => FileUploadModule)],
   controllers: [InvoiceController],
   providers: [InvoiceService],
 })

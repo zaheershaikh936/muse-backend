@@ -34,21 +34,27 @@ export class InvoiceService {
     }
 
     // Company Name
-    doc.fontSize(24)
+    doc
+      .fontSize(24)
       .fillColor('#FF4500') // Custom brand color
       .text('ZONESSO', 50, 50, { align: 'left' })
       .fontSize(14)
       .fillColor('#000000')
-      .text('218 The Iridium Building, Al Barsha, Dubai, UAE', { align: 'left' })
+      .text('218 The Iridium Building, Al Barsha, Dubai, UAE', {
+        align: 'left',
+      })
       .text('Tel: 054 402 1112 | support@zonesso.com', { align: 'left' });
   }
 
   private addInvoiceDetails(doc: PDFKit.PDFDocument, data: any) {
     // Invoice Details
     const topMargin = 50;
-    doc.fontSize(12)
+    doc
+      .fontSize(12)
       .fillColor('#000000')
-      .text(`Invoice No: ${data.invoice.number}`, 400, topMargin, { align: 'right' })
+      .text(`Invoice No: ${data.invoice.number}`, 400, topMargin, {
+        align: 'right',
+      })
       .text(`Invoice Date: ${data.invoice.date}`, { align: 'right' })
       .text(`Status: `, { continued: true })
       .fillColor(data.invoice.statusColor)
@@ -57,7 +63,8 @@ export class InvoiceService {
 
   private addClientDetails(doc: PDFKit.PDFDocument, data: any) {
     // Client Details Section
-    doc.moveDown(2)
+    doc
+      .moveDown(2)
       .fontSize(12)
       .fillColor('#333333')
       .text('Invoice to', 50, 150)
@@ -74,7 +81,8 @@ export class InvoiceService {
     const tableTop = 300;
 
     // Table Header
-    doc.fontSize(12)
+    doc
+      .fontSize(12)
       .fillColor('#FFFFFF')
       .rect(50, tableTop, 500, 25)
       .fill('#FF4500') // Header background
@@ -89,7 +97,8 @@ export class InvoiceService {
     let y = tableTop + 30;
     doc.fillColor('#000000');
     data.items.forEach((item: any) => {
-      doc.text(item.description, 55, y)
+      doc
+        .text(item.description, 55, y)
         .text(item.price, 255, y)
         .text(item.quantity.toString(), 355, y)
         .text(item.totalPrice, 455, y);
@@ -97,7 +106,8 @@ export class InvoiceService {
     });
 
     // Subtotal and Total
-    doc.fontSize(12)
+    doc
+      .fontSize(12)
       .fillColor('#000000')
       .text(`Sub total: ${data.subTotal}`, 400, y + 10, { align: 'right' })
       .fontSize(14)
@@ -109,7 +119,8 @@ export class InvoiceService {
     const footerTop = 450;
 
     // Notes Section
-    doc.moveTo(50, footerTop)
+    doc
+      .moveTo(50, footerTop)
       .fontSize(12)
       .fillColor('#000000')
       .text('Notes:', 50)
@@ -118,7 +129,8 @@ export class InvoiceService {
       .text(data.notes, 50, footerTop + 15);
 
     // Payment Method Section
-    doc.fontSize(12)
+    doc
+      .fontSize(12)
       .fillColor('#000000')
       .text('Payment method:', 50, footerTop + 80)
       .fontSize(10)
@@ -128,7 +140,8 @@ export class InvoiceService {
       .text(`Bank Details: ${data.paymentMethod.bankDetails}`);
 
     // Terms Section
-    doc.fontSize(12)
+    doc
+      .fontSize(12)
       .fillColor('#000000')
       .text('Terms and Conditions:', 300, footerTop + 80)
       .fontSize(10)
@@ -136,11 +149,15 @@ export class InvoiceService {
       .text(data.terms, 300, footerTop + 95);
 
     // Footer
-    doc.moveDown(5)
+    doc
+      .moveDown(5)
       .fontSize(10)
       .fillColor('#000000')
-      .text('218 The Iridium Building, Al Barsha, Dubai, UAE | Tel: 054 402 1112 | support@zonesso.com', {
-        align: 'center',
-      });
+      .text(
+        '218 The Iridium Building, Al Barsha, Dubai, UAE | Tel: 054 402 1112 | support@zonesso.com',
+        {
+          align: 'center',
+        },
+      );
   }
 }

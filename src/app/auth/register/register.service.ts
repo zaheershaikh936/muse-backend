@@ -1,7 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO } from '../dto';
 import { UsersService } from 'src/app/users/user/users.service';
+import { welcomeEmail } from 'src/utils/email-template';
+import axios from 'axios';
+
 @Injectable()
 export class RegisterService {
   constructor(
@@ -10,8 +13,20 @@ export class RegisterService {
   ) {}
 
   async create(registerDTO: RegisterDTO) {
+    const validateEmail = await axios.get(
+      `https://emailvalidation.abstractapi.com/v1?api_key=${process.env.EMAIL_VALIDATION}&email=${registerDTO.email}`,
+    );
+    if (parseFloat(validateEmail.data.quality_score) < 0.8)
+      throw new HttpException(
+        'Temporary email addresses are not allowed. Please use a valid email address.',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     const isExist = await this.userService.isExist(registerDTO.email);
-    if (isExist) throw new UnauthorizedException('User already exist');
+    if (isExist)
+      throw new HttpException(
+        'This email is already registered. Please try to login.',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     const user = await this.userService.create(registerDTO);
     const accessToken = this.generateToken({
       email: user.email,
@@ -23,8 +38,19 @@ export class RegisterService {
       _id: String(user._id),
       role: user.role,
     });
+    await welcomeEmail(registerDTO.email.toLowerCase(), {
+      name: registerDTO.name,
+      website_url: process.env.WEB_URL,
+    });
     return {
-      user: { name: user.name, email: user.email, role: user.role },
+      user: {
+        sub: user._id,
+        isMentor: false,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+      },
       token: { accessToken, refreshToken },
     };
   }

@@ -12,7 +12,7 @@ import {
 import { MentorService } from './mentor/mentor.service';
 import { ProfileService } from './profile/profile.service';
 import { ExperienceService } from './experience/experience.service';
-
+import { getIso2Code } from 'src/utils/api/getLocation';
 import {
   CreateProfileDTO,
   UpdateAboutDTO,
@@ -21,13 +21,17 @@ import {
 } from './dto/profile.dto';
 import { JwtAuthGuard } from 'src/utils/guard/jwt-user.guards';
 import { Request } from 'src/utils/types/index';
-import { ExperienceMentorDto, UpdateExperienceMentorDto } from './dto/experience.dto';
+import {
+  ExperienceMentorDto,
+  UpdateExperienceMentorDto,
+} from './dto/experience.dto';
 import { RoleService } from '../role/role/role.service';
 import { User } from 'src/utils/decorator/user.decorator';
 import { GetMentorDto } from './dto/mentor.dto';
 import { MentorBookingService } from '../bookings/mentor-booking/bookingsMentor.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ProfessionService } from '../profession/profession/profession.service';
+
 @Controller('mentor')
 export class MentorController {
   constructor(
@@ -41,14 +45,19 @@ export class MentorController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/bookings')
-  async mentorBooking(@User('_id') id: string, @Query('status') status: string, @Query('limit') limit: number, @Query('page') page: number) {
+  async mentorBooking(
+    @User('_id') id: string,
+    @Query('status') status: string,
+    @Query('limit') limit: number,
+    @Query('page') page: number,
+  ) {
     const filter = {
       status: status?.length ? status.split(',') : [],
       limit: limit || 10,
       page: page || 1,
-    }
+    };
     const mentor = await this.mentorService.getMentorIdByUserId(id);
-    return this.bookingService.mentorBookings(mentor._id.toString(), filter)
+    return this.bookingService.mentorBookings(mentor._id.toString(), filter);
   }
 
   @Get('suggestions')
@@ -67,7 +76,7 @@ export class MentorController {
   ) {
     createMentorDto.userId = request.user._id;
     const isExist = await this.profileService.isExist(createMentorDto.userId);
-    const iso2: { iso2: string; flag: string } = await this.getIso2Code(
+    const iso2: { iso2: string; flag: string } = await getIso2Code(
       createMentorDto.location.country,
     );
     createMentorDto.location.flag = iso2.flag;
@@ -82,42 +91,6 @@ export class MentorController {
     } else {
       return this.profileService.update(createMentorDto);
     }
-  }
-
-  async getIso2Code(country: string) {
-    const response = await fetch(
-      'https://countriesnow.space/api/v0.1/countries/states',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          country: country,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        redirect: 'follow' as RequestRedirect,
-      },
-    );
-    const data = await response.json();
-    const iso2: string = data?.data?.iso2;
-    const raw = JSON.stringify({
-      iso2: iso2,
-    });
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: raw,
-      redirect: 'follow' as RequestRedirect,
-    };
-
-    const flagResponse = await fetch(
-      'https://countriesnow.space/api/v0.1/countries/flag/images',
-      requestOptions,
-    );
-    const flagData = await flagResponse.json();
-    return { iso2, flag: flagData?.data?.flag };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -155,10 +128,18 @@ export class MentorController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/experience/:id')
-  async updateExperience(@User('_id') sub: string, @Param() id: string, @Body() experienceMentorDto: UpdateExperienceMentorDto) {
+  async updateExperience(
+    @User('_id') sub: string,
+    @Param() id: string,
+    @Body() experienceMentorDto: UpdateExperienceMentorDto,
+  ) {
     experienceMentorDto.userId = sub;
     const data = await this.experienceService.update(id, experienceMentorDto);
-    if (data) await this.profileService.findAndUpdateExperienceById(experienceMentorDto, data?._id.toString())
+    if (data)
+      await this.profileService.findAndUpdateExperienceById(
+        experienceMentorDto,
+        data?._id.toString(),
+      );
     return data;
   }
 
@@ -170,7 +151,11 @@ export class MentorController {
   ) {
     experienceMentorDto.userId = id;
     const data = await this.experienceService.create(experienceMentorDto);
-    if (data) await this.profileService.updateExperience(experienceMentorDto, data?._id)
+    if (data)
+      await this.profileService.updateExperience(
+        experienceMentorDto,
+        data?._id.toString(),
+      );
     return data;
   }
 
@@ -184,7 +169,6 @@ export class MentorController {
     return this.mentorService.featuredMentors();
   }
 
-  // mentor/get-all
   @Post('/get-all')
   async getAllMentor(@Body() body: GetMentorDto) {
     return this.mentorService.getAll(body);
@@ -219,7 +203,7 @@ export class MentorController {
   @UseGuards(AuthGuard('jwt'))
   @Get('/bookings/kpi')
   async bookingMentorKpi(@User('_id') id: any) {
-    const mentor = await this.mentorService.getMentorIdByUserId(id)
-    return this.bookingService.bookingKpi(mentor._id.toString())
+    const mentor = await this.mentorService.getMentorIdByUserId(id);
+    return this.bookingService.bookingKpi(mentor._id.toString());
   }
 }

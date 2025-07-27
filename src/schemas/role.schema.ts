@@ -9,12 +9,14 @@ export class Role {
     type: {
       _id: { type: mongoose.Schema.Types.ObjectId, required: true },
       name: { type: String, required: false },
+      slag: { type: String, required: false },
     },
     required: true,
   })
   profession: {
     _id: mongoose.Schema.Types.ObjectId;
     name: string;
+    slag: string;
   };
 
   @Prop({ required: true, unique: true, searchIndex: true })
@@ -50,7 +52,7 @@ RoleSchema.pre('save', async function (next) {
         .lean();
       if (!profession) throw new Error('Profession not found');
       this.profession.name = profession.name;
-    } catch (error) {
+    } catch (error: any) {
       Logger.error('Error fetching profession', error.message);
       return next(error);
     }

@@ -12,7 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 @UseGuards(AuthGuard('jwt'))
 @Controller('file-upload')
 export class FileUploadController {
-  constructor(private readonly fileUploadService: FileUploadService) { }
+  constructor(private readonly fileUploadService: FileUploadService) {}
 
   @Post()
   @UseInterceptors(

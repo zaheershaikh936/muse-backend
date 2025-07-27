@@ -10,7 +10,6 @@ export class Mentor {
   @Prop({ type: String })
   bgImage: string;
 
-
   @Prop({
     required: false,
     type: {
@@ -21,7 +20,7 @@ export class Mentor {
     },
   })
   user: {
-      userId: string;
+    userId: string;
     name: string;
     email: string;
     image: string;
@@ -84,10 +83,10 @@ export class Mentor {
     ],
   })
   experience: {
-      image: string;
-      company: string;
-      role: string;
-      experienceId: string;
+    image: string;
+    company: string;
+    role: string;
+    experienceId: string;
   }[];
 
   @Prop({ type: String })
@@ -109,9 +108,11 @@ export class Mentor {
   banned: boolean;
 }
 
-
-
 export const MentorSchema = SchemaFactory.createForClass(Mentor);
 
-MentorSchema.index({ 'user.name': 1, 'profession.name': 1, 'location.country': 1, 'skills': 1 });
-
+MentorSchema.index({
+  'user.name': 1,
+  'profession.name': 1,
+  'location.country': 1,
+  skills: 1,
+});

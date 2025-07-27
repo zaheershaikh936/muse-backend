@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from '../dto/user.dto';
+import {
+  CreateUserDto,
+  ResetPasswordDTO,
+  SocialAuthDTO,
+} from '../dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas';
 import { Model } from 'mongoose';
 import { hash } from 'bcrypt';
+import { mentorApplicationApproved } from 'src/utils/email-template';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +16,16 @@ export class UsersService {
 
   isExist(email: string) {
     return this.userModel.countDocuments({ email }).lean();
+  }
+
+  isExistWithType(email: string) {
+    return this.userModel.findOne({ email }, { provider: 1 }).lean();
+  }
+
+  isExistWithPassword(email: string) {
+    return this.userModel
+      .countDocuments({ email: email, password: { $exists: true } })
+      .lean();
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -29,18 +44,30 @@ export class UsersService {
       .lean();
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel
+  async update(id: string, updateUserDto: any) {
+    const user = await this.userModel
       .findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
       .lean();
+    if (updateUserDto.isMentor)
+      await mentorApplicationApproved(user.email, { user: user.name });
+    return user;
   }
 
   findOneForBooking(id: string) {
     return this.userModel
-      .findOne(
-        { _id: id },
-        { _id: 1, email: 1, name: 1, image: 1 },
-      )
+      .findOne({ _id: id }, { _id: 1, email: 1, name: 1, image: 1 })
       .lean();
+  }
+
+  async socialAuthCreate(createUserDto: SocialAuthDTO) {
+    return this.userModel.create(createUserDto);
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDTO) {
+    const password = await hash(resetPasswordDto.password, 10);
+    return await this.userModel.findOneAndUpdate(
+      { email: resetPasswordDto.email },
+      { password: password },
+    );
   }
 }

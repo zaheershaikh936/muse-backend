@@ -4,31 +4,46 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Post,
   Req,
   Res,
 } from '@nestjs/common';
 import { RegisterService } from './register/register.service';
-import { LoginDTO, RegisterDTO } from './dto';
+import {
+  ForgetPasswordDTO,
+  LoginDTO,
+  RegisterDTO,
+  ResetForgetPasswordDTO,
+  SocialRegisterDTO,
+  VerifyForgetPasswordDTO,
+} from './dto';
 import { LoginService } from './login/login.service';
 import { Response, Request } from 'express';
+import { SocialAuthService } from './social-auth/social-auth.services';
+import { ForgetPasswordService } from './forget-password/forget-password.service';
+import { FirebaseService } from '../firebase/firebase.service';
 @Controller('auth')
 export class AuthController {
   constructor(
     private registerService: RegisterService,
     private loginService: LoginService,
+    private socialAuthService: SocialAuthService,
+    private firebaseService: FirebaseService,
+    private forgetPasswordService: ForgetPasswordService,
   ) {}
 
   @Post('/login')
-  async login(@Body() loginDto: LoginDTO,
+  async login(
+    @Body() loginDto: LoginDTO,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const data = await this.loginService.login(loginDto);
-    // @Res({ passthrough: true }) response: Response
-    // response.cookie('refresh_token', data.token.refreshToken, {
-    //   httpOnly: true,
-    //   secure: true,
-    //   maxAge: 7 * 24 * 60 * 60 * 1000,
-    // });
+    response.cookie('refresh_token', data.token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return data;
   }
 
@@ -55,5 +70,46 @@ export class AuthController {
   @Post('/register')
   registerUser(@Body() registerDTO: RegisterDTO) {
     return this.registerService.create(registerDTO);
+  }
+
+  @Post('/social-register')
+  async socialRegister(@Body() socialRegisterBody: SocialRegisterDTO) {
+    switch (socialRegisterBody.provider) {
+      case 'github':
+        Logger.log('Github Auth');
+        return this.socialAuthService.githubAuth(socialRegisterBody);
+      case 'google':
+        await this.firebaseService.firebaseUserIsExist(
+          socialRegisterBody.email,
+        );
+        return this.socialAuthService.googleAuth(socialRegisterBody);
+      default:
+        break;
+    }
+    if (socialRegisterBody.provider === 'github') {
+    }
+  }
+
+  @Post('/forget-password')
+  async forgetPassword(@Body() forgetPasswordDTO: ForgetPasswordDTO) {
+    return this.forgetPasswordService.forgetPassword(forgetPasswordDTO);
+  }
+
+  @Post('/verify/forget-password')
+  async verifyForgetPassword(
+    @Body() verifyForgetPasswordDTO: VerifyForgetPasswordDTO,
+  ) {
+    return this.forgetPasswordService.verifyForgetPassword(
+      verifyForgetPasswordDTO,
+    );
+  }
+
+  @Post('/reset/forget-password')
+  async resetForgetPassword(
+    @Body() verifyForgetPasswordDTO: ResetForgetPasswordDTO,
+  ) {
+    return this.forgetPasswordService.resetForgetPassword(
+      verifyForgetPasswordDTO,
+    );
   }
 }

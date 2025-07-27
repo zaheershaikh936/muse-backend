@@ -13,9 +13,8 @@ import { BookingsModule } from '../bookings/bookings.module';
     ]),
     forwardRef(() => MentorModule),
     forwardRef(() => BookingsModule),
-
   ],
   controllers: [AvailabilityController],
   providers: [AvailabilityService],
 })
-export class AvailabilityModule { }
+export class AvailabilityModule {}
