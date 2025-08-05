@@ -162,94 +162,85 @@ export class ExperienceService {
     ]);
   }
 
-  async getExperienceByMentorId(id: string) {
-    return await this.experienceModel.aggregate([
+  async getExperienceByMentorId(id: string): Promise<unknown> {
+    const [data] = await this.experienceModel.aggregate([
+      // Stage 1: Find all experience documents for the given user
       {
         $match: {
           userId: new ObjectId(id),
         },
       },
+
+      // Stage 2: Use $facet to run two parallel pipelines
       {
-        $project: {
-          company: 1,
-          country: 1,
-          city: 1,
-          image: 1,
-          positions: {
-            $map: {
-              input: '$positions',
-              as: 'position',
-              in: {
-                title: '$$position.title',
-                duration: {
-                  $let: {
-                    vars: {
-                      endDate: {
-                        $cond: {
-                          if: {
-                            $or: [
-                              '$$position.currentlyEmployed',
-                              { $eq: ['$$position.endDate', null] },
-                            ],
-                          },
-                          then: new Date(),
-                          else: '$$position.endDate',
-                        },
-                      },
-                      totalMonths: {
-                        $dateDiff: {
-                          startDate: '$$position.startDate',
-                          endDate: {
-                            $cond: {
-                              if: {
-                                $or: [
-                                  '$$position.currentlyEmployed',
-                                  { $eq: ['$$position.endDate', null] },
-                                ],
+        $facet: {
+          // Pipeline 1: Get the detailed list of experiences (your original query)
+          experiences: [
+            {
+              $project: {
+                company: 1,
+                country: 1,
+                city: 1,
+                image: 1,
+                positions: {
+                  $map: {
+                    input: '$positions',
+                    as: 'position',
+                    in: {
+                      title: '$$position.title',
+                      duration: {
+                        $let: {
+                          vars: {
+                            totalMonths: {
+                              $dateDiff: {
+                                startDate: '$$position.startDate',
+                                endDate: {
+                                  $ifNull: ['$$position.endDate', new Date()],
+                                }, // Simplified logic for end date
+                                unit: 'month',
                               },
-                              then: new Date(),
-                              else: '$$position.endDate',
                             },
                           },
-                          unit: 'month',
-                        },
-                      },
-                    },
-                    in: {
-                      $let: {
-                        vars: {
-                          years: { $floor: { $divide: ['$$totalMonths', 12] } },
-                          months: { $mod: ['$$totalMonths', 12] },
-                        },
-                        in: {
-                          $trim: {
-                            input: {
-                              $concat: [
-                                {
-                                  $cond: {
-                                    if: { $gt: ['$$years', 0] },
-                                    then: {
-                                      $concat: [
-                                        { $toString: '$$years' },
-                                        ' yr ',
-                                      ],
-                                    },
-                                    else: '',
+                          in: {
+                            $let: {
+                              vars: {
+                                years: {
+                                  $floor: { $divide: ['$$totalMonths', 12] },
+                                },
+                                months: { $mod: ['$$totalMonths', 12] },
+                              },
+                              in: {
+                                $trim: {
+                                  input: {
+                                    $concat: [
+                                      {
+                                        $cond: {
+                                          if: { $gt: ['$$years', 0] },
+                                          then: {
+                                            $concat: [
+                                              { $toString: '$$years' },
+                                              ' yr ',
+                                            ],
+                                          },
+                                          else: '',
+                                        },
+                                      },
+                                      {
+                                        $cond: {
+                                          if: { $gt: ['$$months', 0] },
+                                          then: {
+                                            $concat: [
+                                              { $toString: '$$months' },
+                                              ' mon',
+                                            ],
+                                          },
+                                          else: '',
+                                        },
+                                      },
+                                    ],
                                   },
                                 },
-                                {
-                                  $cond: {
-                                    if: { $gt: ['$$months', 0] },
-                                    then: {
-                                      $concat: [
-                                        { $toString: '$$months' },
-                                        ' mon',
-                                      ],
-                                    },
-                                    else: '',
-                                  },
-                                },
-                              ],
+                              },
                             },
                           },
                         },
@@ -257,19 +248,104 @@ export class ExperienceService {
                     },
                   },
                 },
+                employmentType: 1,
+                skills: 1,
               },
             },
-          },
-          employmentType: 1,
-          skills: 1,
+            {
+              $sort: {
+                _id: -1,
+              },
+            },
+          ],
+
+          // Pipeline 2: Calculate the total experience
+          totalExperience: [
+            // Deconstruct the positions array to process each position individually
+            {
+              $unwind: '$positions',
+            },
+            // Calculate the duration of each position in months
+            {
+              $addFields: {
+                durationInMonths: {
+                  $dateDiff: {
+                    startDate: '$positions.startDate',
+                    endDate: {
+                      $ifNull: ['$positions.endDate', new Date()], // If endDate is null (current job), use today's date
+                    },
+                    unit: 'month',
+                  },
+                },
+              },
+            },
+            // Group all positions together and sum their durations
+            {
+              $group: {
+                _id: null, // Group all documents into a single one
+                totalMonths: { $sum: '$durationInMonths' },
+              },
+            },
+            // Format the final total duration into "years" and "months"
+            {
+              $project: {
+                _id: 0,
+                totalMonths: 1, // Keep the numeric total for easy parsing
+                formatted: {
+                  $let: {
+                    vars: {
+                      totalYears: { $floor: { $divide: ['$totalMonths', 12] } },
+                      remainingMonths: { $mod: ['$totalMonths', 12] },
+                    },
+                    in: {
+                      $trim: {
+                        input: {
+                          $concat: [
+                            {
+                              $cond: {
+                                if: { $gt: ['$$totalYears', 0] },
+                                then: {
+                                  $concat: [
+                                    { $toString: '$$totalYears' },
+                                    ' yr ',
+                                  ],
+                                },
+                                else: '',
+                              },
+                            },
+                            {
+                              $cond: {
+                                if: { $gt: ['$$remainingMonths', 0] },
+                                then: {
+                                  $concat: [
+                                    { $toString: '$$remainingMonths' },
+                                    ' mon',
+                                  ],
+                                },
+                                else: '',
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          ],
         },
       },
+      // Stage 3: Reshape the output to be more convenient
       {
-        $sort: {
-          _id: -1,
+        $project: {
+          experiences: '$experiences',
+          // Use $arrayElemAt to get the single object from the totalExperience array
+          totalExperience: { $arrayElemAt: ['$totalExperience', 0] },
         },
       },
     ]);
+    return data;
   }
 
   async getExperienceById(id: string) {

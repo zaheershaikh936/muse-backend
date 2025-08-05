@@ -18,6 +18,10 @@ export class UsersService {
     return this.userModel.countDocuments({ email }).lean();
   }
 
+  isExistWithType(email: string) {
+    return this.userModel.findOne({ email }, { provider: 1 }).lean();
+  }
+
   isExistWithPassword(email: string) {
     return this.userModel
       .countDocuments({ email: email, password: { $exists: true } })
@@ -42,9 +46,10 @@ export class UsersService {
 
   async update(id: string, updateUserDto: any) {
     const user = await this.userModel
-    .findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
-    .lean();
-    if (updateUserDto.isMentor) await mentorApplicationApproved(user.email, { user: user.name, }); 
+      .findByIdAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
+      .lean();
+    if (updateUserDto.isMentor)
+      await mentorApplicationApproved(user.email, { user: user.name });
     return user;
   }
 

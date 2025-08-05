@@ -87,12 +87,10 @@ export class AvailabilityService {
 
       while (current < end) {
         const nextSlot = new Date(current.getTime() + 30 * 60 * 1000);
-
         // Check if the current slot overlaps with any booked slot
         const isBooked = bookings.some((booking) => {
           const bookingStartTime = new Date(booking.booking.startTime);
           const bookingEndTime = new Date(booking.booking.endTime);
-
           return current >= bookingStartTime && current < bookingEndTime;
         });
 

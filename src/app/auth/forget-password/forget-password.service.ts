@@ -54,7 +54,7 @@ export class ForgetPasswordService {
 
   async sendForgetPasswordEmail(email: string, token: string) {
     const base_url: string =
-      process.env.NODE_ENV === 'dev'
+      process.env.REDIRECT_NODE_ENV === 'dev'
         ? process.env.REDIRECT_URL_LOCAL
         : process.env.REDIRECT_URL_PROD;
     await forgetPasswordTemplate(email, {
