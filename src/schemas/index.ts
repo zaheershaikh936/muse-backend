@@ -27,6 +27,11 @@ import {
   MagicLinkSchema,
   MagicLink,
 } from './magic-link.schema';
+import {
+  PreRegisterDocument,
+  PreRegister,
+  PreRegisterSchema,
+} from './pre-register';
 
 export {
   employmentType,
@@ -63,4 +68,7 @@ export {
   MagicLinkDocument,
   MagicLinkSchema,
   MagicLink,
+  PreRegisterDocument,
+  PreRegister,
+  PreRegisterSchema,
 };

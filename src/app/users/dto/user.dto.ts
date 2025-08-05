@@ -119,3 +119,44 @@ export class BecomeMentorDto {
     iso2?: string;
   };
 }
+
+export class UserPreRegister {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  profession: string;
+
+  @IsString()
+  @IsNotEmpty()
+  role: string;
+
+  @IsString()
+  @IsNotEmpty()
+  country: string;
+
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  password: string;
+
+  location: {
+    country: string;
+    city: string;
+    flag?: string;
+    iso2?: string;
+  };
+
+  userId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bio: string;
+}

@@ -22,7 +22,7 @@ export class ProfessionController {
     return this.professionService.getRoles();
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Get('/:id/roles')
   getRolesByProfession(@Param('id') id: string) {
     return this.professionService.getRolesByProfession(id);

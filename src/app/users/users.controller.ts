@@ -78,7 +78,7 @@ export class UsersController {
     @Body() becomeMentor: BecomeMentorDto,
     @User() user: { email: string; _id: string },
   ): Promise<any> {
-    const isExist = await this.mentorProfileService.isExist(user._id);
+    const isExist = await this.usersService.isExist(user._id);
     if (isExist)
       throw new HttpException(
         'You already have a mentor profile. please contact support team.',
