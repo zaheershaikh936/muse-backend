@@ -31,6 +31,7 @@ import { GetMentorDto } from './dto/mentor.dto';
 import { MentorBookingService } from '../bookings/mentor-booking/bookingsMentor.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ProfessionService } from '../profession/profession/profession.service';
+import { ChartDataService } from '../bookings/booking-chart-data/chart-data.service';
 
 @Controller('mentor')
 export class MentorController {
@@ -41,6 +42,7 @@ export class MentorController {
     private readonly roleService: RoleService,
     private readonly bookingService: MentorBookingService,
     private readonly professionService: ProfessionService,
+    private readonly chartDataService: ChartDataService,
   ) {}
 
   @UseGuards(AuthGuard('jwt'))
@@ -122,7 +124,7 @@ export class MentorController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/experience/id/:id')
-  async getExperienceById(@Param('id') id: string) {
+  async getExperienceById(@Param('id') id: string): Promise<any> {
     return this.experienceService.getExperienceById(id);
   }
 
@@ -132,7 +134,7 @@ export class MentorController {
     @User('_id') sub: string,
     @Param() id: string,
     @Body() experienceMentorDto: UpdateExperienceMentorDto,
-  ) {
+  ): Promise<any> {
     experienceMentorDto.userId = sub;
     const data = await this.experienceService.update(id, experienceMentorDto);
     if (data)
@@ -204,6 +206,6 @@ export class MentorController {
   @Get('/bookings/kpi')
   async bookingMentorKpi(@User('_id') id: any) {
     const mentor = await this.mentorService.getMentorIdByUserId(id);
-    return this.bookingService.bookingKpi(mentor._id.toString());
+    return this.chartDataService.bookingKpi(mentor._id.toString());
   }
 }

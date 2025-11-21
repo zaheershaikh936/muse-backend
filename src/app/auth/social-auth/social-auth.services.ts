@@ -3,12 +3,14 @@ import { UsersService } from 'src/app/users/user/users.service';
 import { SocialRegisterDTO } from '../dto';
 import { RegisterService } from '../register/register.service';
 import axios from 'axios';
+import { EmailTemplateService } from 'src/app/mail/email-template/email.template.service';
 
 @Injectable()
 export class SocialAuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly registerService: RegisterService,
+    private readonly emailTemplateService: EmailTemplateService,
   ) {}
   async githubAuth(socialRegisterBody: SocialRegisterDTO) {
     const response = await axios.get('https://api.github.com/user', {
@@ -38,6 +40,10 @@ export class SocialAuthService {
         };
         token = await this.generateAccessToken(userDate);
       }
+      await this.emailTemplateService.sendUserWelcome({
+        name: user.name,
+        email: user.email,
+      });
       return {
         user: {
           sub: user._id,
@@ -74,6 +80,10 @@ export class SocialAuthService {
       };
       token = await this.generateAccessToken(userDate);
     }
+    await this.emailTemplateService.sendUserWelcome({
+      name: user.name,
+      email: user.email,
+    });
     return {
       user: {
         sub: user._id,

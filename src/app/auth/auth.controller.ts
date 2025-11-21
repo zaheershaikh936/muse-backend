@@ -86,8 +86,6 @@ export class AuthController {
       default:
         break;
     }
-    if (socialRegisterBody.provider === 'github') {
-    }
   }
 
   @Post('/forget-password')

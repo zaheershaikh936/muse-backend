@@ -2,14 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO } from '../dto';
 import { UsersService } from 'src/app/users/user/users.service';
-import { welcomeEmail } from 'src/utils/email-template';
 import axios from 'axios';
+import { EmailTemplateService } from 'src/app/mail/email-template/email.template.service';
 
 @Injectable()
 export class RegisterService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
+    private readonly emailTemplateService: EmailTemplateService,
   ) {}
 
   async create(registerDTO: RegisterDTO) {
@@ -38,9 +39,9 @@ export class RegisterService {
       _id: String(user._id),
       role: user.role,
     });
-    await welcomeEmail(registerDTO.email.toLowerCase(), {
+    await this.emailTemplateService.sendUserWelcome({
       name: registerDTO.name,
-      website_url: process.env.WEB_URL,
+      email: registerDTO.email,
     });
     return {
       user: {

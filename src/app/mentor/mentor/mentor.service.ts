@@ -78,18 +78,18 @@ export class MentorService {
     return data;
   }
 
-  getMentorId(userId: string) {
+  getMentorId(userId: string): Promise<any> {
     return this.mentorModel
       .findOne({ userId: new ObjectId(userId) }, { _id: 1, user: 1 })
       .lean()
       .exec();
   }
 
-  findOneForBooking(id: string) {
+  findOneForBooking(id: string): Promise<any> {
     return this.mentorModel.findById(id, { _id: 1, user: 1 }).lean().exec();
   }
 
-  getMentorIdByUserId(id: string) {
+  getMentorIdByUserId(id: string): Promise<any> {
     return this.mentorModel
       .findOne({ userId: new ObjectId(id) }, { _id: 1 })
       .lean()

@@ -16,7 +16,7 @@ export class RoleService {
     return newRole.save();
   }
 
-  findOne(id: string) {
+  findOne(id: string): Promise<any> {
     return this.roleModel.findById({ _id: id }).lean();
   }
   getSuggestions(search: string) {

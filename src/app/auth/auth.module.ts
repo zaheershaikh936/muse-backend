@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas';
-import { UsersModule } from '../index';
+import { MailModule, UsersModule } from '../index';
 import { JwtStrategy } from 'src/utils/common/auth/strategy/jwt.strategy';
 import { FirebaseModule } from '../firebase/firebase.module';
 import { MagicLinkModule } from '../magic-link/magic-link.module';
@@ -24,6 +24,7 @@ import { ForgetPasswordService } from './forget-password/forget-password.service
     }),
     forwardRef(() => FirebaseModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => MailModule),
     forwardRef(() => MagicLinkModule),
   ],
   providers: [

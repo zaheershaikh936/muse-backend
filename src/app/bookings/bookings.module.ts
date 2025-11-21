@@ -5,7 +5,7 @@ import { BookingsController } from './bookings.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Booking, BookingSchema } from 'src/schemas';
 import { MentorModule, PaymentModule, UsersModule } from '../index';
-
+import { ChartDataService } from './booking-chart-data/chart-data.service';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
@@ -14,7 +14,7 @@ import { MentorModule, PaymentModule, UsersModule } from '../index';
     forwardRef(() => PaymentModule),
   ],
   controllers: [BookingsController],
-  providers: [BookingsService, MentorBookingService],
-  exports: [MentorBookingService, BookingsService],
+  providers: [BookingsService, MentorBookingService, ChartDataService],
+  exports: [MentorBookingService, BookingsService, ChartDataService],
 })
 export class BookingsModule {}

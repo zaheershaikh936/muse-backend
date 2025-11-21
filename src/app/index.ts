@@ -15,6 +15,7 @@ import { PaymentModule } from './payment/payment.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { SupportModule } from './support/support.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { MailModule } from './mail/mail.module';
 
 export {
   AuthModule,
@@ -34,4 +35,5 @@ export {
   ReviewsModule,
   SupportModule,
   FirebaseModule,
+  MailModule,
 };

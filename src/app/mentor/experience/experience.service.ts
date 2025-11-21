@@ -348,11 +348,14 @@ export class ExperienceService {
     return data;
   }
 
-  async getExperienceById(id: string) {
+  async getExperienceById(id: string): Promise<any> {
     return this.experienceModel.findById(id).lean().exec();
   }
 
-  async update(id: string, updateExperienceDto: UpdateExperienceMentorDto) {
+  async update(
+    id: string,
+    updateExperienceDto: UpdateExperienceMentorDto,
+  ): Promise<any> {
     return this.experienceModel
       .findByIdAndUpdate(
         { _id: new ObjectId(id) },

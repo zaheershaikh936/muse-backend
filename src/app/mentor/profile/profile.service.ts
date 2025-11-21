@@ -152,7 +152,7 @@ export class ProfileService {
     );
   }
 
-  findMentorExperience(userId: string) {
+  findMentorExperience(userId: string): Promise<any> {
     return this.mentorModel
       .findOne({ userId: new ObjectId(userId) }, { experience: 1 })
       .lean()

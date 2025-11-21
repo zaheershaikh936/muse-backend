@@ -30,19 +30,6 @@ export const sendMail = async (
   }
 };
 
-export const welcomeEmail = async (
-  to: string,
-  data: Record<string, unknown>,
-) => {
-  try {
-    const subject = 'Welcome to the Muse Mentoring Platform';
-    const templateId = process.env.WElCOME_EMAIL_TEMPLATE_ID || '';
-    return await sendMail(to, subject, templateId, data);
-  } catch (error) {
-    return error;
-  }
-};
-
 export const newBooking = async (to: string, data: Record<string, unknown>) => {
   try {
     const subject = `New booking from ${(data.user as { name?: string })?.name}`;
